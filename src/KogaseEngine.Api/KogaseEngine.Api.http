@@ -1,0 +1,6 @@
+@KogaseEngine.Api_HostAddress = http://localhost:5084
+
+GET {{KogaseEngine.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

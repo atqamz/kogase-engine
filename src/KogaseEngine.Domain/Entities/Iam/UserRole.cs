@@ -12,4 +12,4 @@ public class UserRole
     public virtual Role Role { get; set; } = null!;
     public virtual Project? Project { get; set; }
     public virtual User Assigner { get; set; } = null!;
-} 
+}

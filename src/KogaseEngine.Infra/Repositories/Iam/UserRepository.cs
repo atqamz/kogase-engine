@@ -7,7 +7,7 @@ namespace KogaseEngine.Infra.Repositories.Iam;
 
 public class UserRepository : IUserRepository
 {
-    private readonly ApplicationDbContext _context;
+    readonly ApplicationDbContext _context;
 
     public UserRepository(ApplicationDbContext context)
     {
@@ -45,17 +45,14 @@ public class UserRepository : IUserRepository
         var existingUser = await _context.Users.FindAsync(user.Id);
         if (existingUser == null)
             throw new KeyNotFoundException($"User with ID {user.Id} not found.");
-            
+
         _context.Entry(existingUser).CurrentValues.SetValues(user);
     }
 
     public async Task DeleteAsync(Guid id)
     {
         var user = await _context.Users.FindAsync(id);
-        if (user != null)
-        {
-            _context.Users.Remove(user);
-        }
+        if (user != null) _context.Users.Remove(user);
     }
 
     public async Task<IEnumerable<Project?>> GetUserProjectsAsync(Guid userId)

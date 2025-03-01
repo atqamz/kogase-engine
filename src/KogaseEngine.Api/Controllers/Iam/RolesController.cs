@@ -10,7 +10,7 @@ namespace KogaseEngine.Api.Controllers.Iam;
 [Route("api/v1/iam/roles")]
 public class RolesController : ControllerBase
 {
-    private readonly RoleService _roleService;
+    readonly RoleService _roleService;
 
     public RolesController(RoleService roleService)
     {
@@ -78,7 +78,7 @@ public class RolesController : ControllerBase
         return NoContent();
     }
 
-    private RoleDto MapToDto(Role role)
+    RoleDto MapToDto(Role role)
     {
         string[] permissions;
         try

@@ -9,8 +9,8 @@ namespace KogaseEngine.Api.Controllers.Iam;
 [Route("api/v1/iam/projects")]
 public class ProjectsController : ControllerBase
 {
-    private readonly ProjectService _projectService;
-    private readonly UserService _userService;
+    readonly ProjectService _projectService;
+    readonly UserService _userService;
 
     public ProjectsController(ProjectService projectService, UserService userService)
     {
@@ -19,7 +19,8 @@ public class ProjectsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<ProjectDto>>> GetProjects([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+    public async Task<ActionResult<IEnumerable<ProjectDto>>> GetProjects([FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10)
     {
         var projects = await _projectService.GetAllProjectsAsync(page, pageSize);
         return Ok(projects.Select(MapToDto));
@@ -89,7 +90,7 @@ public class ProjectsController : ControllerBase
         return Ok(new { apiKey = newApiKey });
     }
 
-    private ProjectDto MapToDto(Project project)
+    ProjectDto MapToDto(Project project)
     {
         return new ProjectDto
         {

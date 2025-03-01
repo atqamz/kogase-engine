@@ -7,7 +7,7 @@ namespace KogaseEngine.Infra.Repositories.Iam;
 
 public class UserRoleRepository : IUserRoleRepository
 {
-    private readonly ApplicationDbContext _context;
+    readonly ApplicationDbContext _context;
 
     public UserRoleRepository(ApplicationDbContext context)
     {
@@ -17,9 +17,9 @@ public class UserRoleRepository : IUserRoleRepository
     public async Task<UserRole?> GetAsync(Guid userId, Guid roleId, Guid? projectId)
     {
         return await _context.UserRoles
-            .FirstOrDefaultAsync(ur => 
-                ur.UserId == userId && 
-                ur.RoleId == roleId && 
+            .FirstOrDefaultAsync(ur =>
+                ur.UserId == userId &&
+                ur.RoleId == roleId &&
                 ur.ProjectId == projectId);
     }
 
@@ -44,7 +44,7 @@ public class UserRoleRepository : IUserRoleRepository
     public async Task<UserRole> AssignRoleAsync(UserRole userRole)
     {
         userRole.AssignedAt = DateTime.UtcNow;
-        
+
         var existingUserRole = await GetAsync(userRole.UserId, userRole.RoleId, userRole.ProjectId);
         if (existingUserRole != null)
         {
@@ -53,7 +53,7 @@ public class UserRoleRepository : IUserRoleRepository
             existingUserRole.AssignedBy = userRole.AssignedBy;
             return existingUserRole;
         }
-        
+
         await _context.UserRoles.AddAsync(userRole);
         return userRole;
     }
@@ -61,9 +61,6 @@ public class UserRoleRepository : IUserRoleRepository
     public async Task RemoveRoleAsync(Guid userId, Guid roleId, Guid? projectId)
     {
         var userRole = await GetAsync(userId, roleId, projectId);
-        if (userRole != null)
-        {
-            _context.UserRoles.Remove(userRole);
-        }
+        if (userRole != null) _context.UserRoles.Remove(userRole);
     }
 }

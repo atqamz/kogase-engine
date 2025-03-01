@@ -65,7 +65,7 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<Project>()
             .HasIndex(p => p.ApiKey)
             .IsUnique();
-        
+
         // Auth Module configurations
         modelBuilder.Entity<Device>()
             .HasIndex(d => new { d.ProjectId, d.InstallId })
@@ -75,9 +75,9 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<TelemetryEvent>()
             .HasIndex(e => new { e.ProjectId, e.Timestamp })
             .IsDescending(false, true);
-            
+
         modelBuilder.Entity<MetricAggregate>()
             .HasIndex(m => new { m.ProjectId, m.MetricName, m.Date, m.Dimension, m.DimensionValue })
             .IsUnique();
     }
-} 
+}

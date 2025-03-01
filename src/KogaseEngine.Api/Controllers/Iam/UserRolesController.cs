@@ -8,10 +8,10 @@ namespace KogaseEngine.Api.Controllers.Iam;
 [Route("api/v1/iam/userroles")]
 public class UserRolesController : ControllerBase
 {
-    private readonly UserRoleService _userRoleService;
-    private readonly UserService _userService;
-    private readonly RoleService _roleService;
-    private readonly ProjectService _projectService;
+    readonly UserRoleService _userRoleService;
+    readonly UserService _userService;
+    readonly RoleService _roleService;
+    readonly ProjectService _projectService;
 
     public UserRolesController(
         UserRoleService userRoleService,
@@ -61,8 +61,8 @@ public class UserRolesController : ControllerBase
             // Load related entities to build the DTO
             var user = await _userService.GetUserByIdAsync(userRole.UserId);
             var role = await _roleService.GetRoleByIdAsync(userRole.RoleId);
-            var project = assignDto.ProjectId.HasValue 
-                ? await _projectService.GetProjectByIdAsync(assignDto.ProjectId.Value) 
+            var project = assignDto.ProjectId.HasValue
+                ? await _projectService.GetProjectByIdAsync(assignDto.ProjectId.Value)
                 : null;
             var assigner = await _userService.GetUserByIdAsync(assignedBy);
 
@@ -89,7 +89,8 @@ public class UserRolesController : ControllerBase
     }
 
     [HttpDelete("remove")]
-    public async Task<ActionResult> RemoveRole([FromQuery] Guid userId, [FromQuery] Guid roleId, [FromQuery] Guid? projectId)
+    public async Task<ActionResult> RemoveRole([FromQuery] Guid userId, [FromQuery] Guid roleId,
+        [FromQuery] Guid? projectId)
     {
         var userRole = await _userRoleService.GetUserRoleAsync(userId, roleId, projectId);
         if (userRole == null)
@@ -99,16 +100,16 @@ public class UserRolesController : ControllerBase
         return NoContent();
     }
 
-    private async Task<IEnumerable<UserRoleDto>> MapToDtosAsync(IEnumerable<Domain.Entities.Iam.UserRole> userRoles)
+    async Task<IEnumerable<UserRoleDto>> MapToDtosAsync(IEnumerable<Domain.Entities.Iam.UserRole> userRoles)
     {
         var dtos = new List<UserRoleDto>();
-        
+
         foreach (var userRole in userRoles)
         {
             var user = await _userService.GetUserByIdAsync(userRole.UserId);
             var role = await _roleService.GetRoleByIdAsync(userRole.RoleId);
-            var project = userRole.ProjectId.HasValue 
-                ? await _projectService.GetProjectByIdAsync(userRole.ProjectId.Value) 
+            var project = userRole.ProjectId.HasValue
+                ? await _projectService.GetProjectByIdAsync(userRole.ProjectId.Value)
                 : null;
             var assigner = await _userService.GetUserByIdAsync(userRole.AssignedBy);
 

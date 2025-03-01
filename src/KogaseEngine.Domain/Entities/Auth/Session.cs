@@ -25,4 +25,4 @@ public enum SessionStatus
     Ended,
     Expired,
     Terminated
-} 
+}

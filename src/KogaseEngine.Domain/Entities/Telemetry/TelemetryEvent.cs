@@ -21,4 +21,4 @@ public class TelemetryEvent
     public virtual User? User { get; set; }
     public virtual Device Device { get; set; } = null!;
     public virtual Session? Session { get; set; }
-} 
+}

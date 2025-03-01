@@ -19,4 +19,4 @@ public class PlaySession
     public virtual User? User { get; set; }
     public virtual Device Device { get; set; } = null!;
     public virtual Session Session { get; set; } = null!;
-} 
+}

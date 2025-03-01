@@ -6,8 +6,8 @@ namespace KogaseEngine.Core.Services.Iam;
 
 public class ProjectService
 {
-    private readonly IProjectRepository _projectRepository;
-    private readonly IUnitOfWork _unitOfWork;
+    readonly IProjectRepository _projectRepository;
+    readonly IUnitOfWork _unitOfWork;
 
     public ProjectService(IProjectRepository projectRepository, IUnitOfWork unitOfWork)
     {

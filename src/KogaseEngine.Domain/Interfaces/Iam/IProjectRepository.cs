@@ -8,4 +8,3 @@ public interface IProjectRepository : IRepository<Project>
     Task<Project?> GetByApiKeyAsync(string apiKey);
     Task<string> GenerateNewApiKeyAsync(Guid projectId);
 }
-

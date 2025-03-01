@@ -4,7 +4,7 @@ namespace KogaseEngine.Infra.Persistence;
 
 public class UnitOfWork : IUnitOfWork
 {
-    private readonly ApplicationDbContext _context;
+    readonly ApplicationDbContext _context;
 
     public UnitOfWork(ApplicationDbContext context)
     {
@@ -15,4 +15,4 @@ public class UnitOfWork : IUnitOfWork
     {
         return await _context.SaveChangesAsync();
     }
-} 
+}

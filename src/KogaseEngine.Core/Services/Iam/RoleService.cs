@@ -6,8 +6,8 @@ namespace KogaseEngine.Core.Services.Iam;
 
 public class RoleService
 {
-    private readonly IRoleRepository _roleRepository;
-    private readonly IUnitOfWork _unitOfWork;
+    readonly IRoleRepository _roleRepository;
+    readonly IUnitOfWork _unitOfWork;
 
     public RoleService(IRoleRepository roleRepository, IUnitOfWork unitOfWork)
     {

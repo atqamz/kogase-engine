@@ -6,11 +6,11 @@ namespace KogaseEngine.Core.Services.Iam;
 
 public class UserRoleService
 {
-    private readonly IUserRoleRepository _userRoleRepository;
-    private readonly IUserRepository _userRepository;
-    private readonly IRoleRepository _roleRepository;
-    private readonly IProjectRepository _projectRepository;
-    private readonly IUnitOfWork _unitOfWork;
+    readonly IUserRoleRepository _userRoleRepository;
+    readonly IUserRepository _userRepository;
+    readonly IRoleRepository _roleRepository;
+    readonly IProjectRepository _projectRepository;
+    readonly IUnitOfWork _unitOfWork;
 
     public UserRoleService(
         IUserRoleRepository userRoleRepository,

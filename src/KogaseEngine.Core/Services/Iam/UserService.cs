@@ -6,8 +6,8 @@ namespace KogaseEngine.Core.Services.Iam;
 
 public class UserService
 {
-    private readonly IUserRepository _userRepository;
-    private readonly IUnitOfWork _unitOfWork;
+    readonly IUserRepository _userRepository;
+    readonly IUnitOfWork _unitOfWork;
 
     public UserService(IUserRepository userRepository, IUnitOfWork unitOfWork)
     {

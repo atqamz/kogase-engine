@@ -7,7 +7,7 @@ namespace KogaseEngine.Infra.Repositories.Iam;
 
 public class RoleRepository : IRoleRepository
 {
-    private readonly ApplicationDbContext _context;
+    readonly ApplicationDbContext _context;
 
     public RoleRepository(ApplicationDbContext context)
     {
@@ -49,16 +49,13 @@ public class RoleRepository : IRoleRepository
         var existingRole = await _context.Roles.FindAsync(role.Id);
         if (existingRole == null)
             throw new KeyNotFoundException($"Role with ID {role.Id} not found.");
-            
+
         _context.Entry(existingRole).CurrentValues.SetValues(role);
     }
 
     public async Task DeleteAsync(Guid id)
     {
         var role = await _context.Roles.FindAsync(id);
-        if (role != null)
-        {
-            _context.Roles.Remove(role);
-        }
+        if (role != null) _context.Roles.Remove(role);
     }
 }

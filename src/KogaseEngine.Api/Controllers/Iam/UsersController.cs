@@ -11,8 +11,8 @@ namespace KogaseEngine.Api.Controllers.Iam;
 [Route("api/v1/iam/users")]
 public class UsersController : ControllerBase
 {
-    private readonly UserService _userService;
-    private readonly ProjectService _projectService;
+    readonly UserService _userService;
+    readonly ProjectService _projectService;
 
     public UsersController(UserService userService, ProjectService projectService)
     {
@@ -21,7 +21,8 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<UserDto>>> GetUsers([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+    public async Task<ActionResult<IEnumerable<UserDto>>> GetUsers([FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10)
     {
         var users = await _userService.GetAllUsersAsync(page, pageSize);
         return Ok(users.Select(MapToDto));
@@ -106,7 +107,7 @@ public class UsersController : ControllerBase
         }));
     }
 
-    private UserDto MapToDto(User user)
+    UserDto MapToDto(User user)
     {
         return new UserDto
         {
@@ -121,7 +122,7 @@ public class UsersController : ControllerBase
         };
     }
 
-    private string HashPassword(string password)
+    string HashPassword(string password)
     {
         using var sha256 = SHA256.Create();
         var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));

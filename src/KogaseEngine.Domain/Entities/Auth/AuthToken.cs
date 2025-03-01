@@ -15,4 +15,4 @@ public class AuthToken
 
     public virtual User User { get; set; } = null!;
     public virtual Device? Device { get; set; }
-} 
+}

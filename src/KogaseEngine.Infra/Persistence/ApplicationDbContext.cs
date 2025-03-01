@@ -34,22 +34,23 @@ public class ApplicationDbContext : DbContext
 
         // Configure IAM entities
         modelBuilder.Entity<UserRole>()
-            .HasKey(ur => new { ur.UserId, ur.RoleId, ur.ProjectId });
+            .HasKey(ur => new { ur.UserId, ur.RoleId });
 
         modelBuilder.Entity<UserRole>()
             .HasOne(ur => ur.User)
             .WithMany(u => u.UserRoles)
             .HasForeignKey(ur => ur.UserId);
+        
+        modelBuilder.Entity<UserRole>()
+            .HasOne(ur => ur.Project)
+            .WithMany(p => p.UserRoles)
+            .HasForeignKey(ur => ur.ProjectId)
+            .IsRequired(false); // This makes the ProjectId foreign key optional
 
         modelBuilder.Entity<UserRole>()
             .HasOne(ur => ur.Role)
             .WithMany(r => r.UserRoles)
             .HasForeignKey(ur => ur.RoleId);
-
-        modelBuilder.Entity<UserRole>()
-            .HasOne(ur => ur.Project)
-            .WithMany(p => p.UserRoles)
-            .HasForeignKey(ur => ur.ProjectId);
 
         modelBuilder.Entity<UserRole>()
             .HasOne(ur => ur.Assigner)

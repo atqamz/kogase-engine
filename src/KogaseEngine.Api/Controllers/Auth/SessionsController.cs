@@ -13,8 +13,8 @@ namespace KogaseEngine.Api.Controllers.Auth;
 [Route("api/v1/auth/sessions")]
 public class SessionsController : ControllerBase
 {
-    private readonly SessionService _sessionService;
-    private readonly DeviceService _deviceService;
+    readonly SessionService _sessionService;
+    readonly DeviceService _deviceService;
 
     public SessionsController(SessionService sessionService, DeviceService deviceService)
     {
@@ -76,12 +76,9 @@ public class SessionsController : ControllerBase
         {
             var sessions = await _sessionService.GetSessionsByDeviceIdAsync(deviceId);
             var sessionDtos = new List<SessionDto>();
-            
-            foreach (var session in sessions)
-            {
-                sessionDtos.Add(await MapToDtoAsync(session));
-            }
-            
+
+            foreach (var session in sessions) sessionDtos.Add(await MapToDtoAsync(session));
+
             return Ok(sessionDtos);
         }
         catch (InvalidOperationException ex)
@@ -92,20 +89,17 @@ public class SessionsController : ControllerBase
 
     [HttpGet("project/{projectId:guid}")]
     public async Task<ActionResult<IEnumerable<SessionDto>>> GetSessionsByProject(
-        Guid projectId, 
-        [FromQuery] int page = 1, 
+        Guid projectId,
+        [FromQuery] int page = 1,
         [FromQuery] int pageSize = 10)
     {
         try
         {
             var sessions = await _sessionService.GetSessionsByProjectIdAsync(projectId, page, pageSize);
             var sessionDtos = new List<SessionDto>();
-            
-            foreach (var session in sessions)
-            {
-                sessionDtos.Add(await MapToDtoAsync(session));
-            }
-            
+
+            foreach (var session in sessions) sessionDtos.Add(await MapToDtoAsync(session));
+
             return Ok(sessionDtos);
         }
         catch (InvalidOperationException ex)
@@ -116,20 +110,17 @@ public class SessionsController : ControllerBase
 
     [HttpGet("user/{userId:guid}")]
     public async Task<ActionResult<IEnumerable<SessionDto>>> GetSessionsByUser(
-        Guid userId, 
-        [FromQuery] int page = 1, 
+        Guid userId,
+        [FromQuery] int page = 1,
         [FromQuery] int pageSize = 10)
     {
         try
         {
             var sessions = await _sessionService.GetSessionsByUserIdAsync(userId, page, pageSize);
             var sessionDtos = new List<SessionDto>();
-            
-            foreach (var session in sessions)
-            {
-                sessionDtos.Add(await MapToDtoAsync(session));
-            }
-            
+
+            foreach (var session in sessions) sessionDtos.Add(await MapToDtoAsync(session));
+
             return Ok(sessionDtos);
         }
         catch (InvalidOperationException ex)
@@ -145,12 +136,9 @@ public class SessionsController : ControllerBase
         {
             var sessions = await _sessionService.GetActiveSessionsAsync(projectId);
             var sessionDtos = new List<SessionDto>();
-            
-            foreach (var session in sessions)
-            {
-                sessionDtos.Add(await MapToDtoAsync(session));
-            }
-            
+
+            foreach (var session in sessions) sessionDtos.Add(await MapToDtoAsync(session));
+
             return Ok(sessionDtos);
         }
         catch (InvalidOperationException ex)
@@ -159,10 +147,10 @@ public class SessionsController : ControllerBase
         }
     }
 
-    private async Task<SessionDto> MapToDtoAsync(Session session)
+    async Task<SessionDto> MapToDtoAsync(Session session)
     {
-        string deviceInfo = "Unknown Device";
-        
+        var deviceInfo = "Unknown Device";
+
         if (session.Device != null)
         {
             deviceInfo = $"{session.Device.Platform} - {session.Device.DeviceModel} ({session.Device.OsVersion})";
@@ -170,17 +158,12 @@ public class SessionsController : ControllerBase
         else if (session.DeviceId != Guid.Empty)
         {
             var device = await _deviceService.GetDeviceByIdAsync(session.DeviceId);
-            if (device != null)
-            {
-                deviceInfo = $"{device.Platform} - {device.DeviceModel} ({device.OsVersion})";
-            }
+            if (device != null) deviceInfo = $"{device.Platform} - {device.DeviceModel} ({device.OsVersion})";
         }
 
         int? durationSeconds = null;
         if (session.StartTime != default && session.EndTime.HasValue)
-        {
             durationSeconds = (int)(session.EndTime.Value - session.StartTime).TotalSeconds;
-        }
 
         return new SessionDto
         {

@@ -7,13 +7,13 @@ namespace KogaseEngine.Infra.Repositories.Auth;
 
 public class AuthTokenRepository : IAuthTokenRepository
 {
-    private readonly ApplicationDbContext _context;
+    readonly ApplicationDbContext _context;
 
     public AuthTokenRepository(ApplicationDbContext context)
     {
         _context = context;
     }
-    
+
     public async Task<AuthToken?> GetByIdAsync(Guid id)
     {
         return await _context.AuthTokens
@@ -35,7 +35,7 @@ public class AuthTokenRepository : IAuthTokenRepository
     public async Task<AuthToken> CreateAsync(AuthToken authToken)
     {
         authToken.IssuedAt = DateTime.UtcNow;
-        
+
         await _context.AuthTokens.AddAsync(authToken);
         return authToken;
     }
@@ -49,10 +49,7 @@ public class AuthTokenRepository : IAuthTokenRepository
     public Task DeleteAsync(Guid id)
     {
         var authToken = _context.AuthTokens.Find(id);
-        if (authToken != null)
-        {
-            _context.AuthTokens.Remove(authToken);
-        }
+        if (authToken != null) _context.AuthTokens.Remove(authToken);
 
         return Task.CompletedTask;
     }
@@ -89,10 +86,7 @@ public class AuthTokenRepository : IAuthTokenRepository
             .Where(t => t.UserId == userId && t.RevokedAt == null)
             .ToListAsync();
 
-        foreach (var token in tokens)
-        {
-            token.RevokedAt = DateTime.UtcNow;
-        }
+        foreach (var token in tokens) token.RevokedAt = DateTime.UtcNow;
 
         _context.AuthTokens.UpdateRange(tokens);
     }
@@ -103,10 +97,7 @@ public class AuthTokenRepository : IAuthTokenRepository
             .Where(t => t.DeviceId == deviceId && t.RevokedAt == null)
             .ToListAsync();
 
-        foreach (var token in tokens)
-        {
-            token.RevokedAt = DateTime.UtcNow;
-        }
+        foreach (var token in tokens) token.RevokedAt = DateTime.UtcNow;
 
         _context.AuthTokens.UpdateRange(tokens);
     }

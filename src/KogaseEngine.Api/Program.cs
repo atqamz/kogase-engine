@@ -14,14 +14,11 @@ using Microsoft.OpenApi.Models;
 using System.Text;
 
 
-
 var builder = WebApplication.CreateBuilder(args);
-
 
 
 // Add services to the container.
 builder.Services.AddControllers();
-
 
 
 // Register Swagger/OpenAPI
@@ -37,16 +34,13 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 
-
 // Add DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 
-
 // Register repositories
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-
 
 
 // Register Repositories
@@ -60,7 +54,6 @@ builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
 builder.Services.AddScoped<IDeviceRepository, DeviceRepository>();
 builder.Services.AddScoped<ISessionRepository, SessionRepository>();
 builder.Services.AddScoped<IAuthTokenRepository, AuthTokenRepository>();
-
 
 
 // Register services
@@ -103,9 +96,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 
-
 var app = builder.Build();
-
 
 
 // Initialize the database
@@ -113,7 +104,6 @@ using (var scope = app.Services.CreateScope())
 {
     await DbInitializer.Initialize(scope.ServiceProvider);
 }
-
 
 
 // Configure the HTTP request pipeline.
@@ -128,11 +118,9 @@ if (app.Environment.IsDevelopment())
 }
 
 
-
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
-
 
 
 app.Run();

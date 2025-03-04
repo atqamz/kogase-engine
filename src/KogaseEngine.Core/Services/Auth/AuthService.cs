@@ -13,14 +13,14 @@ namespace KogaseEngine.Core.Services.Auth;
 
 public class AuthService
 {
-    private readonly IAuthTokenRepository _authTokenRepository;
-    private readonly IUserRepository _userRepository;
-    private readonly IDeviceRepository _deviceRepository;
-    private readonly ISessionRepository _sessionRepository;
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly string _jwtSecret;
-    private readonly int _tokenExpirationMinutes;
-    private readonly int _refreshTokenExpirationDays;
+    readonly IAuthTokenRepository _authTokenRepository;
+    readonly IUserRepository _userRepository;
+    readonly IDeviceRepository _deviceRepository;
+    readonly ISessionRepository _sessionRepository;
+    readonly IUnitOfWork _unitOfWork;
+    readonly string _jwtSecret;
+    readonly int _tokenExpirationMinutes;
+    readonly int _refreshTokenExpirationDays;
 
     public AuthService(
         IAuthTokenRepository authTokenRepository,
@@ -43,7 +43,8 @@ public class AuthService
         _refreshTokenExpirationDays = refreshTokenExpirationDays;
     }
 
-    public async Task<(string Token, string RefreshToken, DateTime ExpiresAt)> AuthenticateUserAsync(string email, string password, Guid? deviceId = null)
+    public async Task<(string Token, string RefreshToken, DateTime ExpiresAt)> AuthenticateUserAsync(string email,
+        string password, Guid? deviceId = null)
     {
         // Get user by email
         var user = await _userRepository.GetByEmailAsync(email);
@@ -64,7 +65,7 @@ public class AuthService
 
         // Generate tokens
         var (token, refreshToken, expiresAt) = await GenerateTokensForUserAsync(user.Id, deviceId);
-        
+
         await _unitOfWork.SaveChangesAsync();
 
         return (token, refreshToken, expiresAt);
@@ -85,8 +86,9 @@ public class AuthService
         await _authTokenRepository.RevokeAsync(authToken.Id);
 
         // Generate new tokens
-        var (token, newRefreshToken, expiresAt) = await GenerateTokensForUserAsync(authToken.UserId, authToken.DeviceId);
-        
+        var (token, newRefreshToken, expiresAt) =
+            await GenerateTokensForUserAsync(authToken.UserId, authToken.DeviceId);
+
         await _unitOfWork.SaveChangesAsync();
 
         return (token, newRefreshToken, expiresAt);
@@ -145,29 +147,31 @@ public class AuthService
         }
     }
 
-    private async Task<(string Token, string RefreshToken, DateTime ExpiresAt)> GenerateTokensForUserAsync(Guid userId, Guid? deviceId)
+    async Task<(string Token, string RefreshToken, DateTime ExpiresAt)> GenerateTokensForUserAsync(Guid userId,
+        Guid? deviceId)
     {
         // Generate JWT token
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.ASCII.GetBytes(_jwtSecret);
         var expiresAt = DateTime.UtcNow.AddMinutes(_tokenExpirationMinutes);
-        
+
         var tokenDescriptor = new SecurityTokenDescriptor
         {
-            Subject = new ClaimsIdentity(new[] 
-            { 
+            Subject = new ClaimsIdentity(new[]
+            {
                 new Claim("sub", userId.ToString())
             }),
             Expires = expiresAt,
-            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            SigningCredentials =
+                new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
         };
-        
+
         var securityToken = tokenHandler.CreateToken(tokenDescriptor);
         var token = tokenHandler.WriteToken(securityToken);
-        
+
         // Generate refresh token
         var refreshToken = GenerateRefreshToken();
-        
+
         // Save to database
         var authToken = new AuthToken
         {
@@ -178,13 +182,13 @@ public class AuthService
             ExpiresAt = expiresAt,
             IssuedAt = DateTime.UtcNow
         };
-        
+
         await _authTokenRepository.CreateAsync(authToken);
-        
+
         return (token, refreshToken, expiresAt);
     }
 
-    private string GenerateRefreshToken()
+    string GenerateRefreshToken()
     {
         var randomNumber = new byte[32];
         using var rng = RandomNumberGenerator.Create();
@@ -192,7 +196,7 @@ public class AuthService
         return Convert.ToBase64String(randomNumber);
     }
 
-    private bool VerifyPassword(string password, string storedHash)
+    bool VerifyPassword(string password, string storedHash)
     {
         using var sha256 = SHA256.Create();
         var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));

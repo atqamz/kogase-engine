@@ -9,9 +9,9 @@ namespace KogaseEngine.Api.Controllers.Auth;
 [Route("api/v1/auth")]
 public class AuthController : ControllerBase
 {
-    private readonly AuthService _authService;
-    private readonly UserService _userService;
-    private readonly DeviceService _deviceService;
+    readonly AuthService _authService;
+    readonly UserService _userService;
+    readonly DeviceService _deviceService;
 
     public AuthController(
         AuthService authService,
@@ -29,9 +29,9 @@ public class AuthController : ControllerBase
     {
         try
         {
-            var (token, refreshToken, expiresAt) = 
+            var (token, refreshToken, expiresAt) =
                 await _authService.AuthenticateUserAsync(loginDto.Email, loginDto.Password, loginDto.DeviceId);
-            
+
             var user = await _userService.GetUserByEmailAsync(loginDto.Email);
             if (user == null)
                 return NotFound(new { message = "User not found" });
@@ -79,7 +79,7 @@ public class AuthController : ControllerBase
 
         var token = authorization.Substring("Bearer ".Length).Trim();
         await _authService.RevokeTokenAsync(token);
-        
+
         return NoContent();
     }
 
@@ -100,7 +100,7 @@ public class AuthController : ControllerBase
 
             // The actual linking is done implicitly through sessions and auth tokens
             // This endpoint exists primarily for documentation and future extensions
-            
+
             return Ok(new { message = "Device linked successfully" });
         }
         catch (InvalidOperationException ex)
@@ -121,7 +121,7 @@ public class AuthController : ControllerBase
 
             // Revoke all tokens for this device
             await _authService.RevokeAllDeviceTokensAsync(deviceId);
-            
+
             return NoContent();
         }
         catch (InvalidOperationException ex)

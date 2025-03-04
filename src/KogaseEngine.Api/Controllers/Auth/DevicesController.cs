@@ -10,7 +10,7 @@ namespace KogaseEngine.Api.Controllers.Auth;
 [Route("api/v1/auth/devices")]
 public class DevicesController : ControllerBase
 {
-    private readonly DeviceService _deviceService;
+    readonly DeviceService _deviceService;
 
     public DevicesController(DeviceService deviceService)
     {
@@ -24,9 +24,7 @@ public class DevicesController : ControllerBase
         {
             // Parse platform enum
             if (!Enum.TryParse<DevicePlatform>(registerDto.Platform, true, out var platform))
-            {
                 return BadRequest(new { message = "Invalid platform value." });
-            }
 
             var device = new Device
             {
@@ -97,15 +95,12 @@ public class DevicesController : ControllerBase
         }
     }
 
-    private DeviceDto MapToDto(Device device)
+    DeviceDto MapToDto(Device device)
     {
         object? metadata = null;
         try
         {
-            if (!string.IsNullOrEmpty(device.Metadata))
-            {
-                metadata = JsonSerializer.Deserialize<object>(device.Metadata);
-            }
+            if (!string.IsNullOrEmpty(device.Metadata)) metadata = JsonSerializer.Deserialize<object>(device.Metadata);
         }
         catch
         {

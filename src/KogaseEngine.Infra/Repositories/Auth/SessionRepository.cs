@@ -7,7 +7,7 @@ namespace KogaseEngine.Infra.Repositories.Auth;
 
 public class SessionRepository : ISessionRepository
 {
-    private readonly ApplicationDbContext _context;
+    readonly ApplicationDbContext _context;
 
     public SessionRepository(ApplicationDbContext context)
     {
@@ -37,7 +37,7 @@ public class SessionRepository : ISessionRepository
     {
         session.StartTime = DateTime.UtcNow;
         session.Status = SessionStatus.Active;
-        
+
         await _context.Sessions.AddAsync(session);
         return session;
     }
@@ -45,16 +45,13 @@ public class SessionRepository : ISessionRepository
     public Task UpdateAsync(Session session)
     {
         _context.Sessions.Update(session);
-        return Task.CompletedTask;  
+        return Task.CompletedTask;
     }
 
     public Task DeleteAsync(Guid id)
     {
         var session = _context.Sessions.Find(id);
-        if (session != null)
-        {
-            _context.Sessions.Remove(session);
-        }
+        if (session != null) _context.Sessions.Remove(session);
 
         return Task.CompletedTask;
     }

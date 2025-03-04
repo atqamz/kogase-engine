@@ -7,11 +7,11 @@ namespace KogaseEngine.Core.Services.Auth;
 
 public class SessionService
 {
-    private readonly ISessionRepository _sessionRepository;
-    private readonly IDeviceRepository _deviceRepository;
-    private readonly IProjectRepository _projectRepository;
-    private readonly IUserRepository _userRepository;
-    private readonly IUnitOfWork _unitOfWork;
+    readonly ISessionRepository _sessionRepository;
+    readonly IDeviceRepository _deviceRepository;
+    readonly IProjectRepository _projectRepository;
+    readonly IUserRepository _userRepository;
+    readonly IUnitOfWork _unitOfWork;
 
     public SessionService(
         ISessionRepository sessionRepository,
@@ -91,11 +91,11 @@ public class SessionService
 
         // Create the session
         var newSession = await _sessionRepository.CreateAsync(session);
-        
+
         // Update device last active time
         device.LastActiveAt = DateTime.UtcNow;
         await _deviceRepository.UpdateAsync(device);
-        
+
         await _unitOfWork.SaveChangesAsync();
         return newSession;
     }

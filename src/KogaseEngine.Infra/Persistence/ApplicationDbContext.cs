@@ -35,7 +35,7 @@ public class ApplicationDbContext : DbContext
             .HasOne(ur => ur.User)
             .WithMany(u => u.UserRoles)
             .HasForeignKey(ur => ur.UserId);
-        
+
         modelBuilder.Entity<UserRole>()
             .HasOne(ur => ur.Project)
             .WithMany(p => p.UserRoles)

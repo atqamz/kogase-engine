@@ -13,16 +13,13 @@ public static class DbInitializer
     {
         using var scope = serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        
+
         // Apply pending migrations if they exist
         await context.Database.MigrateAsync();
-        
+
         // Check if data already exists
-        if (context.Users.Any())
-        {
-            return; // DB has been seeded
-        }
-        
+        if (context.Users.Any()) return; // DB has been seeded
+
         // Create admin user
         var adminUser = new User
         {
@@ -35,7 +32,7 @@ public static class DbInitializer
             Status = UserStatus.Active,
             CreatedAt = DateTime.UtcNow
         };
-        
+
         // Create basic roles
         var adminRole = new Role
         {
@@ -44,7 +41,7 @@ public static class DbInitializer
             Description = "Full system access",
             Permissions = JsonSerializer.Serialize(new[] { "all" })
         };
-        
+
         var developerRole = new Role
         {
             Id = Guid.NewGuid(),
@@ -52,7 +49,7 @@ public static class DbInitializer
             Description = "Project management access",
             Permissions = JsonSerializer.Serialize(new[] { "project.read", "project.write", "telemetry.read" })
         };
-        
+
         var viewerRole = new Role
         {
             Id = Guid.NewGuid(),
@@ -60,7 +57,7 @@ public static class DbInitializer
             Description = "Read-only access",
             Permissions = JsonSerializer.Serialize(new[] { "project.read", "telemetry.read" })
         };
-        
+
         // Create a sample project
         var demoProject = new Project
         {
@@ -74,7 +71,7 @@ public static class DbInitializer
             UpdatedAt = DateTime.UtcNow,
             Settings = "{\"allowAnonymousTelemetry\": true}"
         };
-        
+
         // Assign admin role to admin user
         var userRole = new UserRole
         {
@@ -84,23 +81,23 @@ public static class DbInitializer
             AssignedAt = DateTime.UtcNow,
             AssignedBy = adminUser.Id
         };
-        
+
         // Add data to context
         context.Users.Add(adminUser);
         context.Roles.AddRange(adminRole, developerRole, viewerRole);
         context.Projects.Add(demoProject);
         context.UserRoles.Add(userRole);
-        
+
         await context.SaveChangesAsync();
     }
-    
+
     static string HashPassword(string password)
     {
         using var sha256 = SHA256.Create();
         var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
         return Convert.ToBase64String(hashedBytes);
     }
-    
+
     static string GenerateApiKey()
     {
         var key = new byte[32];
@@ -108,6 +105,7 @@ public static class DbInitializer
         {
             rng.GetBytes(key);
         }
+
         return Convert.ToBase64String(key).Replace("/", "_").Replace("+", "-").Replace("=", "");
     }
 }

@@ -7,13 +7,13 @@ namespace KogaseEngine.Infra.Repositories.Auth;
 
 public class DeviceRepository : IDeviceRepository
 {
-    private readonly ApplicationDbContext _context;
+    readonly ApplicationDbContext _context;
 
     public DeviceRepository(ApplicationDbContext context)
     {
         _context = context;
     }
-    
+
     public async Task<Device?> GetByIdAsync(Guid id)
     {
         return await _context.Devices
@@ -34,7 +34,7 @@ public class DeviceRepository : IDeviceRepository
     {
         device.FirstSeenAt = DateTime.UtcNow;
         device.LastActiveAt = DateTime.UtcNow;
-        
+
         await _context.Devices.AddAsync(device);
         return device;
     }
@@ -49,10 +49,7 @@ public class DeviceRepository : IDeviceRepository
     public async Task DeleteAsync(Guid id)
     {
         var device = await _context.Devices.FindAsync(id);
-        if (device != null)
-        {
-            _context.Devices.Remove(device);
-        }
+        if (device != null) _context.Devices.Remove(device);
     }
 
     public async Task<Device?> GetByInstallIdAsync(Guid projectId, string installId)

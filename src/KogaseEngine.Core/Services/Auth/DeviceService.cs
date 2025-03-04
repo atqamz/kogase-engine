@@ -7,12 +7,12 @@ namespace KogaseEngine.Core.Services.Auth;
 
 public class DeviceService
 {
-    private readonly IDeviceRepository _deviceRepository;
-    private readonly IProjectRepository _projectRepository;
-    private readonly IUnitOfWork _unitOfWork;
+    readonly IDeviceRepository _deviceRepository;
+    readonly IProjectRepository _projectRepository;
+    readonly IUnitOfWork _unitOfWork;
 
     public DeviceService(
-        IDeviceRepository deviceRepository, 
+        IDeviceRepository deviceRepository,
         IProjectRepository projectRepository,
         IUnitOfWork unitOfWork
     )

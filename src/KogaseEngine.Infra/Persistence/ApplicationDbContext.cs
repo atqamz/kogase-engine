@@ -22,6 +22,12 @@ public class ApplicationDbContext : DbContext
     public DbSet<Device> Devices { get; set; } = null!;
     public DbSet<Session> Sessions { get; set; } = null!;
     public DbSet<AuthToken> AuthTokens { get; set; } = null!;
+    
+    // Telemetry Module
+    public DbSet<TelemetryEvent> TelemetryEvents { get; set; } = null!;
+    public DbSet<PlaySession> PlaySessions { get; set; } = null!;
+    public DbSet<MetricAggregate> MetricAggregates { get; set; } = null!;
+    public DbSet<EventDefinition> EventDefinitions { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -105,11 +111,48 @@ public class ApplicationDbContext : DbContext
 
         // Telemetry Module configurations
         modelBuilder.Entity<TelemetryEvent>()
-            .HasIndex(e => new { e.ProjectId, e.Timestamp })
-            .IsDescending(false, true);
+            .HasIndex(e => e.Timestamp);
+
+        modelBuilder.Entity<TelemetryEvent>()
+            .HasIndex(e => new { e.ProjectId, e.EventName });
+
+        modelBuilder.Entity<TelemetryEvent>()
+            .HasIndex(e => new { e.ProjectId, e.SessionId });
+
+        modelBuilder.Entity<TelemetryEvent>()
+            .HasOne(e => e.Session)
+            .WithMany(s => s.Events)
+            .HasForeignKey(e => e.SessionId);
+
+        modelBuilder.Entity<PlaySession>()
+            .HasOne(s => s.Project)
+            .WithMany()
+            .HasForeignKey(s => s.ProjectId);
+
+        modelBuilder.Entity<PlaySession>()
+            .HasOne(s => s.User)
+            .WithMany()
+            .HasForeignKey(s => s.UserId);
+
+        modelBuilder.Entity<PlaySession>()
+            .HasOne(s => s.Device)
+            .WithMany()
+            .HasForeignKey(s => s.DeviceId);
+
+        modelBuilder.Entity<PlaySession>()
+            .HasIndex(s => s.StartTime);
 
         modelBuilder.Entity<MetricAggregate>()
-            .HasIndex(m => new { m.ProjectId, m.MetricName, m.Date, m.Dimension, m.DimensionValue })
+            .HasIndex(m => new { m.ProjectId, m.MetricName, m.Dimension, m.DimensionValue, m.Timestamp, m.Period })
             .IsUnique();
+
+        modelBuilder.Entity<EventDefinition>()
+            .HasIndex(d => new { d.ProjectId, d.EventName })
+            .IsUnique();
+
+        modelBuilder.Entity<EventDefinition>()
+            .HasOne(d => d.Project)
+            .WithMany()
+            .HasForeignKey(d => d.ProjectId);
     }
 }

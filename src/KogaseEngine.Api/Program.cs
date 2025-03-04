@@ -12,6 +12,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using KogaseEngine.Core.Services.Telemetry;
+using KogaseEngine.Domain.Interfaces.Telemetry;
+using KogaseEngine.Infra.Repositories.Telemetry;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -55,6 +58,12 @@ builder.Services.AddScoped<IDeviceRepository, DeviceRepository>();
 builder.Services.AddScoped<ISessionRepository, SessionRepository>();
 builder.Services.AddScoped<IAuthTokenRepository, AuthTokenRepository>();
 
+// Telemetry Module repositories
+builder.Services.AddScoped<ITelemetryEventRepository, TelemetryEventRepository>();
+builder.Services.AddScoped<IPlaySessionRepository, PlaySessionRepository>();
+builder.Services.AddScoped<IMetricAggregateRepository, MetricAggregateRepository>();
+builder.Services.AddScoped<IEventDefinitionRepository, EventDefinitionRepository>();
+
 
 // Register services
 // IAM Module services
@@ -66,6 +75,12 @@ builder.Services.AddScoped<UserRoleService>();
 // Auth Module services
 builder.Services.AddScoped<DeviceService>();
 builder.Services.AddScoped<SessionService>();
+
+// Telemetry Module services
+builder.Services.AddScoped<TelemetryEventService>();
+builder.Services.AddScoped<PlaySessionService>();
+builder.Services.AddScoped<MetricAggregateService>();
+builder.Services.AddScoped<EventDefinitionService>();
 
 
 // Configure JWT Authentication

@@ -2,7 +2,7 @@ using KogaseEngine.Domain.Entities.Iam;
 
 namespace KogaseEngine.Domain.Interfaces.Iam;
 
-public interface IUserRoleRepository
+public interface IUserRoleRepository : IRepository<UserRole>
 {
     Task<UserRole?> GetAsync(Guid userId, Guid roleId, Guid? projectId);
     Task<IEnumerable<UserRole>> GetByUserIdAsync(Guid userId);

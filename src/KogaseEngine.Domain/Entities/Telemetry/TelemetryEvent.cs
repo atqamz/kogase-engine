@@ -15,14 +15,14 @@ public class TelemetryEvent
     public string Payload { get; set; } = "{}";
     public string Parameters { get; set; } = "{}";
     public string ClientInfo { get; set; } = "{}";
-    
+
     public virtual PlaySession? Session { get; set; }
 
     public T? GetPayload<T>()
     {
         if (string.IsNullOrEmpty(Payload))
             return default;
-            
+
         try
         {
             return JsonSerializer.Deserialize<T>(Payload);
@@ -32,12 +32,12 @@ public class TelemetryEvent
             return default;
         }
     }
-    
+
     public T? GetParameters<T>()
     {
         if (string.IsNullOrEmpty(Parameters))
             return default;
-            
+
         try
         {
             return JsonSerializer.Deserialize<T>(Parameters);
@@ -47,12 +47,12 @@ public class TelemetryEvent
             return default;
         }
     }
-    
+
     public T? GetClientInfo<T>()
     {
         if (string.IsNullOrEmpty(ClientInfo))
             return default;
-            
+
         try
         {
             return JsonSerializer.Deserialize<T>(ClientInfo);

@@ -17,12 +17,10 @@ public class EventDefinitionDto
 
 public class CreateEventDefinitionDto
 {
-    [JsonRequired]
-    public Guid ProjectId { get; set; }
-    
-    [JsonRequired]
-    public string EventName { get; set; } = string.Empty;
-    
+    [JsonRequired] public Guid ProjectId { get; set; }
+
+    [JsonRequired] public string EventName { get; set; } = string.Empty;
+
     public string Category { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public bool IsEnabled { get; set; } = true;

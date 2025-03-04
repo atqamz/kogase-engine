@@ -22,7 +22,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Device> Devices { get; set; } = null!;
     public DbSet<Session> Sessions { get; set; } = null!;
     public DbSet<AuthToken> AuthTokens { get; set; } = null!;
-    
+
     // Telemetry Module
     public DbSet<TelemetryEvent> TelemetryEvents { get; set; } = null!;
     public DbSet<PlaySession> PlaySessions { get; set; } = null!;

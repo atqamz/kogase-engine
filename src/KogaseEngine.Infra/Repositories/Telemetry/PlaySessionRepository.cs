@@ -11,7 +11,8 @@ public class PlaySessionRepository : Repository<PlaySession>, IPlaySessionReposi
     {
     }
 
-    public async Task<IEnumerable<PlaySession>> GetSessionsByProjectIdAsync(Guid projectId, int page = 1, int pageSize = 100)
+    public async Task<IEnumerable<PlaySession>> GetSessionsByProjectIdAsync(Guid projectId, int page = 1,
+        int pageSize = 100)
     {
         return await _context.PlaySessions
             .Where(s => s.ProjectId == projectId)
@@ -31,7 +32,8 @@ public class PlaySessionRepository : Repository<PlaySession>, IPlaySessionReposi
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<PlaySession>> GetSessionsByDeviceIdAsync(Guid deviceId, int page = 1, int pageSize = 100)
+    public async Task<IEnumerable<PlaySession>> GetSessionsByDeviceIdAsync(Guid deviceId, int page = 1,
+        int pageSize = 100)
     {
         return await _context.PlaySessions
             .Where(s => s.DeviceId == deviceId)
@@ -44,12 +46,13 @@ public class PlaySessionRepository : Repository<PlaySession>, IPlaySessionReposi
     public async Task<IEnumerable<PlaySession>> GetActiveSessionsAsync(Guid projectId)
     {
         return await _context.PlaySessions
-            .Where(s => s.ProjectId == projectId && s.Status == SessionStatus.Active)
+            .Where(s => s.ProjectId == projectId && s.Status == PlaySessionStatus.Active)
             .OrderByDescending(s => s.StartTime)
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<PlaySession>> GetSessionsByTimeRangeAsync(Guid projectId, DateTime start, DateTime end, int page = 1, int pageSize = 100)
+    public async Task<IEnumerable<PlaySession>> GetSessionsByTimeRangeAsync(Guid projectId, DateTime start,
+        DateTime end, int page = 1, int pageSize = 100)
     {
         return await _context.PlaySessions
             .Where(s => s.ProjectId == projectId && s.StartTime >= start && (s.EndTime == null || s.EndTime <= end))
@@ -70,6 +73,6 @@ public class PlaySessionRepository : Repository<PlaySession>, IPlaySessionReposi
     {
         return await _context.PlaySessions
             .Where(s => s.ProjectId == projectId && s.DurationSeconds.HasValue)
-            .AverageAsync(s => s.DurationSeconds.Value);
+            .AverageAsync(s => s.DurationSeconds!.Value);
     }
 }

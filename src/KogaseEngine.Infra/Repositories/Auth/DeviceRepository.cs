@@ -5,23 +5,20 @@ using Microsoft.EntityFrameworkCore;
 
 namespace KogaseEngine.Infra.Repositories.Auth;
 
-public class DeviceRepository : IDeviceRepository
+public class DeviceRepository : Repository<Device>, IDeviceRepository
 {
-    readonly ApplicationDbContext _context;
-
-    public DeviceRepository(ApplicationDbContext context)
+    public DeviceRepository(ApplicationDbContext context) : base(context)
     {
-        _context = context;
     }
 
-    public async Task<Device?> GetByIdAsync(Guid id)
+    public override async Task<Device?> GetByIdAsync(Guid id)
     {
         return await _context.Devices
             .Include(d => d.Project)
             .FirstOrDefaultAsync(d => d.Id == id);
     }
 
-    public async Task<IEnumerable<Device>> GetAllAsync(int page = 1, int pageSize = 10)
+    public override async Task<IEnumerable<Device>> GetAllAsync(int page = 1, int pageSize = 10)
     {
         return await _context.Devices
             .Include(d => d.Project)
@@ -30,26 +27,17 @@ public class DeviceRepository : IDeviceRepository
             .ToListAsync();
     }
 
-    public async Task<Device> CreateAsync(Device device)
+    public override async Task<Device> CreateAsync(Device device)
     {
         device.FirstSeenAt = DateTime.UtcNow;
         device.LastActiveAt = DateTime.UtcNow;
-
-        await _context.Devices.AddAsync(device);
-        return device;
+        return await base.CreateAsync(device);
     }
 
-    public Task UpdateAsync(Device device)
+    public override Task UpdateAsync(Device device)
     {
         device.LastActiveAt = DateTime.UtcNow;
-        _context.Devices.Update(device);
-        return Task.CompletedTask;
-    }
-
-    public async Task DeleteAsync(Guid id)
-    {
-        var device = await _context.Devices.FindAsync(id);
-        if (device != null) _context.Devices.Remove(device);
+        return base.UpdateAsync(device);
     }
 
     public async Task<Device?> GetByInstallIdAsync(Guid projectId, string installId)

@@ -14,14 +14,14 @@ public class EventDefinition
     public string Schema { get; set; } = "{}"; // JSON Schema for validation
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
-    
+
     public virtual Project? Project { get; set; }
-    
+
     public T? GetSchema<T>()
     {
         if (string.IsNullOrEmpty(Schema))
             return default;
-            
+
         try
         {
             return JsonSerializer.Deserialize<T>(Schema);

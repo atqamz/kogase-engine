@@ -10,8 +10,8 @@ namespace KogaseEngine.Core.Services.Telemetry;
 
 public class EventDefinitionService
 {
-    private readonly IEventDefinitionRepository _definitionRepository;
-    private readonly IUnitOfWork _unitOfWork;
+    readonly IEventDefinitionRepository _definitionRepository;
+    readonly IUnitOfWork _unitOfWork;
 
     public EventDefinitionService(
         IEventDefinitionRepository definitionRepository,
@@ -25,18 +25,18 @@ public class EventDefinitionService
     {
         // Check if definition already exists
         var existingDefinition = await _definitionRepository.GetDefinitionByNameAsync(
-            definition.ProjectId, 
+            definition.ProjectId,
             definition.EventName);
-            
+
         if (existingDefinition != null)
             throw new InvalidOperationException($"Event definition for '{definition.EventName}' already exists");
-            
+
         definition.Id = Guid.NewGuid();
         definition.CreatedAt = DateTime.UtcNow;
-        
+
         await _definitionRepository.CreateAsync(definition);
         await _unitOfWork.SaveChangesAsync();
-        
+
         return definition;
     }
 
@@ -45,16 +45,16 @@ public class EventDefinitionService
         var definition = await _definitionRepository.GetByIdAsync(definitionId);
         if (definition == null)
             throw new InvalidOperationException("Event definition not found");
-            
+
         definition.Description = updatedDefinition.Description;
         definition.Category = updatedDefinition.Category;
         definition.IsEnabled = updatedDefinition.IsEnabled;
         definition.Schema = updatedDefinition.Schema;
         definition.UpdatedAt = DateTime.UtcNow;
-        
+
         await _definitionRepository.UpdateAsync(definition);
         await _unitOfWork.SaveChangesAsync();
-        
+
         return definition;
     }
 
@@ -83,10 +83,10 @@ public class EventDefinitionService
         var definition = await _definitionRepository.GetByIdAsync(definitionId);
         if (definition == null)
             return false;
-            
+
         await _definitionRepository.DeleteAsync(definitionId);
         await _unitOfWork.SaveChangesAsync();
-        
+
         return true;
     }
 
@@ -95,7 +95,7 @@ public class EventDefinitionService
         var definition = await _definitionRepository.GetDefinitionByNameAsync(projectId, eventName);
         if (definition == null || string.IsNullOrEmpty(definition.Schema))
             return true; // No schema to validate against
-            
+
         // In a real implementation, you would use a JSON Schema validator library here
         // For this example, we'll just check if the payload is valid JSON
         try

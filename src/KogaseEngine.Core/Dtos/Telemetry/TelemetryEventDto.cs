@@ -19,16 +19,14 @@ public class TelemetryEventDto
 
 public class LogEventDto
 {
-    [JsonRequired]
-    public Guid ProjectId { get; set; }
-    
+    [JsonRequired] public Guid ProjectId { get; set; }
+
     public Guid? UserId { get; set; }
     public Guid? DeviceId { get; set; }
     public Guid? SessionId { get; set; }
-    
-    [JsonRequired]
-    public string EventName { get; set; } = string.Empty;
-    
+
+    [JsonRequired] public string EventName { get; set; } = string.Empty;
+
     public string Category { get; set; } = string.Empty;
     public object? Payload { get; set; }
     public object? Parameters { get; set; }
@@ -37,9 +35,7 @@ public class LogEventDto
 
 public class BatchLogEventDto
 {
-    [JsonRequired]
-    public Guid ProjectId { get; set; }
-    
-    [JsonRequired]
-    public LogEventDto[] Events { get; set; } = [];
+    [JsonRequired] public Guid ProjectId { get; set; }
+
+    [JsonRequired] public LogEventDto[] Events { get; set; } = [];
 }

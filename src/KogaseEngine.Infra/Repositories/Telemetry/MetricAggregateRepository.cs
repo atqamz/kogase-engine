@@ -11,7 +11,8 @@ public class MetricAggregateRepository : Repository<MetricAggregate>, IMetricAgg
     {
     }
 
-    public async Task<IEnumerable<MetricAggregate>> GetMetricsByProjectIdAsync(Guid projectId, int page = 1, int pageSize = 100)
+    public async Task<IEnumerable<MetricAggregate>> GetMetricsByProjectIdAsync(Guid projectId, int page = 1,
+        int pageSize = 100)
     {
         return await _context.MetricAggregates
             .Where(m => m.ProjectId == projectId)
@@ -29,7 +30,8 @@ public class MetricAggregateRepository : Repository<MetricAggregate>, IMetricAgg
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<MetricAggregate>> GetMetricsByDimensionAsync(Guid projectId, string dimension, string dimensionValue)
+    public async Task<IEnumerable<MetricAggregate>> GetMetricsByDimensionAsync(Guid projectId, string dimension,
+        string dimensionValue)
     {
         return await _context.MetricAggregates
             .Where(m => m.ProjectId == projectId && m.Dimension == dimension && m.DimensionValue == dimensionValue)
@@ -37,7 +39,8 @@ public class MetricAggregateRepository : Repository<MetricAggregate>, IMetricAgg
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<MetricAggregate>> GetMetricsByPeriodAsync(Guid projectId, AggregationPeriod period, DateTime start, DateTime end)
+    public async Task<IEnumerable<MetricAggregate>> GetMetricsByPeriodAsync(Guid projectId, AggregationPeriod period,
+        DateTime start, DateTime end)
     {
         return await _context.MetricAggregates
             .Where(m => m.ProjectId == projectId && m.Period == period && m.Timestamp >= start && m.Timestamp <= end)
@@ -59,11 +62,11 @@ public class MetricAggregateRepository : Repository<MetricAggregate>, IMetricAgg
         foreach (var metric in metrics)
         {
             var existingMetric = await _context.MetricAggregates
-                .FirstOrDefaultAsync(m => 
-                    m.ProjectId == metric.ProjectId && 
-                    m.MetricName == metric.MetricName && 
-                    m.Dimension == metric.Dimension && 
-                    m.DimensionValue == metric.DimensionValue && 
+                .FirstOrDefaultAsync(m =>
+                    m.ProjectId == metric.ProjectId &&
+                    m.MetricName == metric.MetricName &&
+                    m.Dimension == metric.Dimension &&
+                    m.DimensionValue == metric.DimensionValue &&
                     m.Timestamp == metric.Timestamp &&
                     m.Period == metric.Period);
 

@@ -6,10 +6,10 @@ namespace KogaseEngine.Core.Services.Telemetry;
 
 public class TelemetryEventService
 {
-    private readonly ITelemetryEventRepository _eventRepository;
-    private readonly IPlaySessionRepository _sessionRepository;
-    private readonly IEventDefinitionRepository _definitionRepository;
-    private readonly IUnitOfWork _unitOfWork;
+    readonly ITelemetryEventRepository _eventRepository;
+    readonly IPlaySessionRepository _sessionRepository;
+    readonly IEventDefinitionRepository _definitionRepository;
+    readonly IUnitOfWork _unitOfWork;
 
     public TelemetryEventService(
         ITelemetryEventRepository eventRepository,
@@ -29,8 +29,9 @@ public class TelemetryEventService
         telemetryEvent.Timestamp = DateTime.UtcNow;
 
         // Verify event definition exists for this project
-        var definition = await _definitionRepository.GetDefinitionByNameAsync(telemetryEvent.ProjectId, telemetryEvent.EventName);
-        
+        var definition =
+            await _definitionRepository.GetDefinitionByNameAsync(telemetryEvent.ProjectId, telemetryEvent.EventName);
+
         // If definition doesn't exist, we'll create it automatically
         if (definition == null)
         {
@@ -44,13 +45,13 @@ public class TelemetryEventService
                 IsEnabled = true,
                 CreatedAt = DateTime.UtcNow
             };
-            
+
             await _definitionRepository.CreateAsync(definition);
         }
-        
+
         await _eventRepository.CreateAsync(telemetryEvent);
         await _unitOfWork.SaveChangesAsync();
-        
+
         return telemetryEvent;
     }
 
@@ -58,25 +59,26 @@ public class TelemetryEventService
     {
         var eventsList = events.ToList();
         var timestamp = DateTime.UtcNow;
-        
+
         foreach (var telemetryEvent in eventsList)
         {
             telemetryEvent.Id = Guid.NewGuid();
             telemetryEvent.Timestamp = timestamp;
-            
+
             // We'll auto-create definitions in bulk later
         }
-        
+
         // Auto-create event definitions for any new event types
         var uniqueEventTypes = eventsList
             .Select(e => new { e.ProjectId, e.EventName, e.Category })
             .Distinct()
             .ToList();
-            
+
         foreach (var eventType in uniqueEventTypes)
         {
-            var definition = await _definitionRepository.GetDefinitionByNameAsync(eventType.ProjectId, eventType.EventName);
-            
+            var definition =
+                await _definitionRepository.GetDefinitionByNameAsync(eventType.ProjectId, eventType.EventName);
+
             if (definition == null)
             {
                 definition = new EventDefinition
@@ -89,14 +91,14 @@ public class TelemetryEventService
                     IsEnabled = true,
                     CreatedAt = DateTime.UtcNow
                 };
-                
+
                 await _definitionRepository.CreateAsync(definition);
             }
         }
-        
+
         await _eventRepository.BatchInsertEventsAsync(eventsList);
         await _unitOfWork.SaveChangesAsync();
-        
+
         return eventsList;
     }
 
@@ -105,7 +107,8 @@ public class TelemetryEventService
         return await _eventRepository.GetByIdAsync(eventId);
     }
 
-    public async Task<IEnumerable<TelemetryEvent>> GetEventsByProjectIdAsync(Guid projectId, int page = 1, int pageSize = 100)
+    public async Task<IEnumerable<TelemetryEvent>> GetEventsByProjectIdAsync(Guid projectId, int page = 1,
+        int pageSize = 100)
     {
         return await _eventRepository.GetEventsByProjectIdAsync(projectId, page, pageSize);
     }
@@ -120,22 +123,26 @@ public class TelemetryEventService
         return await _eventRepository.GetEventsByUserIdAsync(userId, page, pageSize);
     }
 
-    public async Task<IEnumerable<TelemetryEvent>> GetEventsByDeviceIdAsync(Guid deviceId, int page = 1, int pageSize = 100)
+    public async Task<IEnumerable<TelemetryEvent>> GetEventsByDeviceIdAsync(Guid deviceId, int page = 1,
+        int pageSize = 100)
     {
         return await _eventRepository.GetEventsByDeviceIdAsync(deviceId, page, pageSize);
     }
 
-    public async Task<IEnumerable<TelemetryEvent>> GetEventsByNameAsync(Guid projectId, string eventName, int page = 1, int pageSize = 100)
+    public async Task<IEnumerable<TelemetryEvent>> GetEventsByNameAsync(Guid projectId, string eventName, int page = 1,
+        int pageSize = 100)
     {
         return await _eventRepository.GetEventsByNameAsync(projectId, eventName, page, pageSize);
     }
 
-    public async Task<IEnumerable<TelemetryEvent>> GetEventsByCategoryAsync(Guid projectId, string category, int page = 1, int pageSize = 100)
+    public async Task<IEnumerable<TelemetryEvent>> GetEventsByCategoryAsync(Guid projectId, string category,
+        int page = 1, int pageSize = 100)
     {
         return await _eventRepository.GetEventsByCategoryAsync(projectId, category, page, pageSize);
     }
 
-    public async Task<IEnumerable<TelemetryEvent>> GetEventsByTimeRangeAsync(Guid projectId, DateTime start, DateTime end, int page = 1, int pageSize = 100)
+    public async Task<IEnumerable<TelemetryEvent>> GetEventsByTimeRangeAsync(Guid projectId, DateTime start,
+        DateTime end, int page = 1, int pageSize = 100)
     {
         return await _eventRepository.GetEventsByTimeRangeAsync(projectId, start, end, page, pageSize);
     }

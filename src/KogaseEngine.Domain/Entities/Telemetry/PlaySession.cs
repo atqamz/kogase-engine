@@ -18,15 +18,15 @@ public class PlaySession
     public string DeviceModel { get; set; } = string.Empty;
     public string OsVersion { get; set; } = string.Empty;
     public string SessionProperties { get; set; } = "{}";
-    public SessionStatus Status { get; set; } = SessionStatus.Active;
-    
+    public PlaySessionStatus Status { get; set; } = PlaySessionStatus.Active;
+
     public virtual Project? Project { get; set; }
     public virtual User? User { get; set; }
     public virtual Device? Device { get; set; }
     public virtual ICollection<TelemetryEvent> Events { get; set; } = new List<TelemetryEvent>();
 }
 
-public enum SessionStatus
+public enum PlaySessionStatus
 {
     Active,
     Ended,

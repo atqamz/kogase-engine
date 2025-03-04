@@ -11,7 +11,8 @@ public class TelemetryEventRepository : Repository<TelemetryEvent>, ITelemetryEv
     {
     }
 
-    public async Task<IEnumerable<TelemetryEvent>> GetEventsByProjectIdAsync(Guid projectId, int page = 1, int pageSize = 100)
+    public async Task<IEnumerable<TelemetryEvent>> GetEventsByProjectIdAsync(Guid projectId, int page = 1,
+        int pageSize = 100)
     {
         return await _context.TelemetryEvents
             .Where(e => e.ProjectId == projectId)
@@ -39,7 +40,8 @@ public class TelemetryEventRepository : Repository<TelemetryEvent>, ITelemetryEv
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<TelemetryEvent>> GetEventsByDeviceIdAsync(Guid deviceId, int page = 1, int pageSize = 100)
+    public async Task<IEnumerable<TelemetryEvent>> GetEventsByDeviceIdAsync(Guid deviceId, int page = 1,
+        int pageSize = 100)
     {
         return await _context.TelemetryEvents
             .Where(e => e.DeviceId == deviceId)
@@ -49,7 +51,8 @@ public class TelemetryEventRepository : Repository<TelemetryEvent>, ITelemetryEv
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<TelemetryEvent>> GetEventsByNameAsync(Guid projectId, string eventName, int page = 1, int pageSize = 100)
+    public async Task<IEnumerable<TelemetryEvent>> GetEventsByNameAsync(Guid projectId, string eventName, int page = 1,
+        int pageSize = 100)
     {
         return await _context.TelemetryEvents
             .Where(e => e.ProjectId == projectId && e.EventName == eventName)
@@ -59,7 +62,8 @@ public class TelemetryEventRepository : Repository<TelemetryEvent>, ITelemetryEv
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<TelemetryEvent>> GetEventsByCategoryAsync(Guid projectId, string category, int page = 1, int pageSize = 100)
+    public async Task<IEnumerable<TelemetryEvent>> GetEventsByCategoryAsync(Guid projectId, string category,
+        int page = 1, int pageSize = 100)
     {
         return await _context.TelemetryEvents
             .Where(e => e.ProjectId == projectId && e.Category == category)
@@ -69,7 +73,8 @@ public class TelemetryEventRepository : Repository<TelemetryEvent>, ITelemetryEv
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<TelemetryEvent>> GetEventsByTimeRangeAsync(Guid projectId, DateTime start, DateTime end, int page = 1, int pageSize = 100)
+    public async Task<IEnumerable<TelemetryEvent>> GetEventsByTimeRangeAsync(Guid projectId, DateTime start,
+        DateTime end, int page = 1, int pageSize = 100)
     {
         return await _context.TelemetryEvents
             .Where(e => e.ProjectId == projectId && e.Timestamp >= start && e.Timestamp <= end)

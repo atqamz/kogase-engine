@@ -19,12 +19,12 @@ public class MetricAggregate
     public int Count { get; set; }
     public int UniqueCount { get; set; }
     public string AdditionalData { get; set; } = "{}";
-    
+
     public T? GetAdditionalData<T>()
     {
         if (string.IsNullOrEmpty(AdditionalData))
             return default;
-            
+
         try
         {
             return JsonSerializer.Deserialize<T>(AdditionalData);

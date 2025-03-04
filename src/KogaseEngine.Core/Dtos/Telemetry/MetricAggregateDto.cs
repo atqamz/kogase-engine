@@ -24,21 +24,16 @@ public class MetricAggregateDto
 
 public class UpsertMetricDto
 {
-    [JsonRequired]
-    public Guid ProjectId { get; set; }
-    
-    [JsonRequired]
-    public string MetricName { get; set; } = string.Empty;
-    
-    [JsonRequired]
-    public string Dimension { get; set; } = string.Empty;
-    
-    [JsonRequired]
-    public string DimensionValue { get; set; } = string.Empty;
-    
-    [JsonRequired]
-    public AggregationPeriod Period { get; set; }
-    
+    [JsonRequired] public Guid ProjectId { get; set; }
+
+    [JsonRequired] public string MetricName { get; set; } = string.Empty;
+
+    [JsonRequired] public string Dimension { get; set; } = string.Empty;
+
+    [JsonRequired] public string DimensionValue { get; set; } = string.Empty;
+
+    [JsonRequired] public AggregationPeriod Period { get; set; }
+
     public double Sum { get; set; }
     public double Average { get; set; }
     public double Min { get; set; }

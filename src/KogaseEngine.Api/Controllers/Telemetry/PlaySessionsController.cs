@@ -12,10 +12,10 @@ namespace KogaseEngine.Api.Controllers.Telemetry;
 [Route("api/v1/telemetry/sessions")]
 public class PlaySessionsController : ControllerBase
 {
-    private readonly PlaySessionService _sessionService;
-    private readonly TelemetryEventService _eventService;
-    private readonly UserService _userService;
-    private readonly DeviceService _deviceService;
+    readonly PlaySessionService _sessionService;
+    readonly TelemetryEventService _eventService;
+    readonly UserService _userService;
+    readonly DeviceService _deviceService;
 
     public PlaySessionsController(
         PlaySessionService sessionService,
@@ -44,9 +44,11 @@ public class PlaySessionsController : ControllerBase
                 Country = startDto.Country,
                 DeviceModel = startDto.DeviceModel,
                 OsVersion = startDto.OsVersion,
-                SessionProperties = startDto.SessionProperties != null ? JsonSerializer.Serialize(startDto.SessionProperties) : "{}"
+                SessionProperties = startDto.SessionProperties != null
+                    ? JsonSerializer.Serialize(startDto.SessionProperties)
+                    : "{}"
             };
-            
+
             var result = await _sessionService.StartSessionAsync(session);
             return Ok(await MapToDtoAsync(result));
         }
@@ -64,7 +66,7 @@ public class PlaySessionsController : ControllerBase
             var session = await _sessionService.EndSessionAsync(sessionId);
             if (session == null)
                 return NotFound();
-                
+
             return Ok(await MapToDtoAsync(session));
         }
         catch (InvalidOperationException ex)
@@ -74,14 +76,15 @@ public class PlaySessionsController : ControllerBase
     }
 
     [HttpPut("status/{sessionId:guid}")]
-    public async Task<ActionResult<PlaySessionDto>> UpdateSessionStatus(Guid sessionId, UpdateSessionStatusDto updateDto)
+    public async Task<ActionResult<PlaySessionDto>> UpdateSessionStatus(Guid sessionId,
+        UpdateSessionStatusDto updateDto)
     {
         try
         {
             var session = await _sessionService.UpdateSessionStatusAsync(sessionId, updateDto.Status);
             if (session == null)
                 return NotFound();
-                
+
             return Ok(await MapToDtoAsync(session));
         }
         catch (InvalidOperationException ex)
@@ -96,58 +99,49 @@ public class PlaySessionsController : ControllerBase
         var session = await _sessionService.GetSessionByIdAsync(sessionId);
         if (session == null)
             return NotFound();
-            
+
         return Ok(await MapToDtoAsync(session));
     }
 
     [HttpGet("project/{projectId:guid}")]
     public async Task<ActionResult<IEnumerable<PlaySessionDto>>> GetSessionsByProject(
-        Guid projectId, 
-        [FromQuery] int page = 1, 
+        Guid projectId,
+        [FromQuery] int page = 1,
         [FromQuery] int pageSize = 100)
     {
         var sessions = await _sessionService.GetSessionsByProjectIdAsync(projectId, page, pageSize);
         var sessionDtos = new List<PlaySessionDto>();
-        
-        foreach (var session in sessions)
-        {
-            sessionDtos.Add(await MapToDtoAsync(session));
-        }
-        
+
+        foreach (var session in sessions) sessionDtos.Add(await MapToDtoAsync(session));
+
         return Ok(sessionDtos);
     }
 
     [HttpGet("user/{userId:guid}")]
     public async Task<ActionResult<IEnumerable<PlaySessionDto>>> GetSessionsByUser(
-        Guid userId, 
-        [FromQuery] int page = 1, 
+        Guid userId,
+        [FromQuery] int page = 1,
         [FromQuery] int pageSize = 100)
     {
         var sessions = await _sessionService.GetSessionsByUserIdAsync(userId, page, pageSize);
         var sessionDtos = new List<PlaySessionDto>();
-        
-        foreach (var session in sessions)
-        {
-            sessionDtos.Add(await MapToDtoAsync(session));
-        }
-        
+
+        foreach (var session in sessions) sessionDtos.Add(await MapToDtoAsync(session));
+
         return Ok(sessionDtos);
     }
 
     [HttpGet("device/{deviceId:guid}")]
     public async Task<ActionResult<IEnumerable<PlaySessionDto>>> GetSessionsByDevice(
-        Guid deviceId, 
-        [FromQuery] int page = 1, 
+        Guid deviceId,
+        [FromQuery] int page = 1,
         [FromQuery] int pageSize = 100)
     {
         var sessions = await _sessionService.GetSessionsByDeviceIdAsync(deviceId, page, pageSize);
         var sessionDtos = new List<PlaySessionDto>();
-        
-        foreach (var session in sessions)
-        {
-            sessionDtos.Add(await MapToDtoAsync(session));
-        }
-        
+
+        foreach (var session in sessions) sessionDtos.Add(await MapToDtoAsync(session));
+
         return Ok(sessionDtos);
     }
 
@@ -156,31 +150,25 @@ public class PlaySessionsController : ControllerBase
     {
         var sessions = await _sessionService.GetActiveSessionsAsync(projectId);
         var sessionDtos = new List<PlaySessionDto>();
-        
-        foreach (var session in sessions)
-        {
-            sessionDtos.Add(await MapToDtoAsync(session));
-        }
-        
+
+        foreach (var session in sessions) sessionDtos.Add(await MapToDtoAsync(session));
+
         return Ok(sessionDtos);
     }
 
     [HttpGet("timerange/{projectId:guid}")]
     public async Task<ActionResult<IEnumerable<PlaySessionDto>>> GetSessionsByTimeRange(
-        Guid projectId, 
-        [FromQuery] DateTime start, 
-        [FromQuery] DateTime end, 
-        [FromQuery] int page = 1, 
+        Guid projectId,
+        [FromQuery] DateTime start,
+        [FromQuery] DateTime end,
+        [FromQuery] int page = 1,
         [FromQuery] int pageSize = 100)
     {
         var sessions = await _sessionService.GetSessionsByTimeRangeAsync(projectId, start, end, page, pageSize);
         var sessionDtos = new List<PlaySessionDto>();
-        
-        foreach (var session in sessions)
-        {
-            sessionDtos.Add(await MapToDtoAsync(session));
-        }
-        
+
+        foreach (var session in sessions) sessionDtos.Add(await MapToDtoAsync(session));
+
         return Ok(sessionDtos);
     }
 
@@ -198,7 +186,7 @@ public class PlaySessionsController : ControllerBase
         return Ok(new { averageDuration });
     }
 
-    private async Task<PlaySessionDto> MapToDtoAsync(PlaySession session)
+    async Task<PlaySessionDto> MapToDtoAsync(PlaySession session)
     {
         string? userName = null;
         if (session.UserId.HasValue)
@@ -207,7 +195,7 @@ public class PlaySessionsController : ControllerBase
             if (user != null)
                 userName = $"{user.FirstName} {user.LastName}";
         }
-        
+
         string? deviceInfo = null;
         if (session.DeviceId.HasValue)
         {
@@ -215,7 +203,7 @@ public class PlaySessionsController : ControllerBase
             if (device != null)
                 deviceInfo = $"{device.Platform} - {device.DeviceModel} ({device.OsVersion})";
         }
-        
+
         object? sessionProperties = null;
         try
         {
@@ -226,11 +214,11 @@ public class PlaySessionsController : ControllerBase
         {
             // If deserialization fails, leave as null
         }
-        
-        int eventCount = 0;
+
+        var eventCount = 0;
         if (session.Id != Guid.Empty)
             eventCount = await _eventService.GetEventCountBySessionIdAsync(session.Id);
-        
+
         return new PlaySessionDto
         {
             Id = session.Id,

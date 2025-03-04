@@ -5,13 +5,10 @@ using KogaseEngine.Infra.Persistence;
 
 namespace KogaseEngine.Infra.Repositories.Iam;
 
-public class UserRoleRepository : IUserRoleRepository
+public class UserRoleRepository : Repository<UserRole>, IUserRoleRepository
 {
-    readonly ApplicationDbContext _context;
-
-    public UserRoleRepository(ApplicationDbContext context)
+    public UserRoleRepository(ApplicationDbContext context) : base(context)
     {
-        _context = context;
     }
 
     public async Task<UserRole?> GetAsync(Guid userId, Guid roleId, Guid? projectId)

@@ -5,16 +5,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace KogaseEngine.Infra.Repositories.Auth;
 
-public class SessionRepository : ISessionRepository
+public class SessionRepository : Repository<Session>, ISessionRepository
 {
-    readonly ApplicationDbContext _context;
-
-    public SessionRepository(ApplicationDbContext context)
+    public SessionRepository(ApplicationDbContext context) : base(context)
     {
-        _context = context;
     }
 
-    public async Task<Session?> GetByIdAsync(Guid id)
+    public override async Task<Session?> GetByIdAsync(Guid id)
     {
         return await _context.Sessions
             .Include(s => s.Device)
@@ -22,7 +19,7 @@ public class SessionRepository : ISessionRepository
             .FirstOrDefaultAsync(s => s.Id == id);
     }
 
-    public async Task<IEnumerable<Session>> GetAllAsync(int page = 1, int pageSize = 10)
+    public override async Task<IEnumerable<Session>> GetAllAsync(int page = 1, int pageSize = 10)
     {
         return await _context.Sessions
             .Include(s => s.Device)
@@ -33,27 +30,12 @@ public class SessionRepository : ISessionRepository
             .ToListAsync();
     }
 
-    public async Task<Session> CreateAsync(Session session)
+    public override async Task<Session> CreateAsync(Session session)
     {
         session.StartTime = DateTime.UtcNow;
         session.Status = SessionStatus.Active;
 
-        await _context.Sessions.AddAsync(session);
-        return session;
-    }
-
-    public Task UpdateAsync(Session session)
-    {
-        _context.Sessions.Update(session);
-        return Task.CompletedTask;
-    }
-
-    public Task DeleteAsync(Guid id)
-    {
-        var session = _context.Sessions.Find(id);
-        if (session != null) _context.Sessions.Remove(session);
-
-        return Task.CompletedTask;
+        return await base.CreateAsync(session);
     }
 
     public async Task<IEnumerable<Session>> GetByDeviceIdAsync(Guid deviceId)

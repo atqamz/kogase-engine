@@ -20,16 +20,15 @@ public class PlaySessionDto
     public string DeviceModel { get; set; } = string.Empty;
     public string OsVersion { get; set; } = string.Empty;
     public object? SessionProperties { get; set; }
-    public SessionStatus Status { get; set; }
+    public PlaySessionStatus Status { get; set; }
     public string StatusString { get; set; } = string.Empty;
     public int EventCount { get; set; }
 }
 
 public class StartPlaySessionDto
 {
-    [JsonRequired]
-    public Guid ProjectId { get; set; }
-    
+    [JsonRequired] public Guid ProjectId { get; set; }
+
     public Guid? UserId { get; set; }
     public Guid? DeviceId { get; set; }
     public string GameVersion { get; set; } = string.Empty;
@@ -42,6 +41,5 @@ public class StartPlaySessionDto
 
 public class UpdateSessionStatusDto
 {
-    [JsonRequired]
-    public SessionStatus Status { get; set; }
+    [JsonRequired] public PlaySessionStatus Status { get; set; }
 }

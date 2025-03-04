@@ -5,16 +5,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace KogaseEngine.Infra.Repositories.Auth;
 
-public class AuthTokenRepository : IAuthTokenRepository
+public class AuthTokenRepository : Repository<AuthToken>, IAuthTokenRepository
 {
-    readonly ApplicationDbContext _context;
-
-    public AuthTokenRepository(ApplicationDbContext context)
+    public AuthTokenRepository(ApplicationDbContext context) : base(context)
     {
-        _context = context;
     }
 
-    public async Task<AuthToken?> GetByIdAsync(Guid id)
+    public override async Task<AuthToken?> GetByIdAsync(Guid id)
     {
         return await _context.AuthTokens
             .Include(t => t.User)
@@ -22,7 +19,7 @@ public class AuthTokenRepository : IAuthTokenRepository
             .FirstOrDefaultAsync(t => t.Id == id);
     }
 
-    public async Task<IEnumerable<AuthToken>> GetAllAsync(int page = 1, int pageSize = 10)
+    public override async Task<IEnumerable<AuthToken>> GetAllAsync(int page = 1, int pageSize = 10)
     {
         return await _context.AuthTokens
             .Include(t => t.User)
@@ -32,26 +29,10 @@ public class AuthTokenRepository : IAuthTokenRepository
             .ToListAsync();
     }
 
-    public async Task<AuthToken> CreateAsync(AuthToken authToken)
+    public override async Task<AuthToken> CreateAsync(AuthToken authToken)
     {
         authToken.IssuedAt = DateTime.UtcNow;
-
-        await _context.AuthTokens.AddAsync(authToken);
-        return authToken;
-    }
-
-    public Task UpdateAsync(AuthToken authToken)
-    {
-        _context.AuthTokens.Update(authToken);
-        return Task.CompletedTask;
-    }
-
-    public Task DeleteAsync(Guid id)
-    {
-        var authToken = _context.AuthTokens.Find(id);
-        if (authToken != null) _context.AuthTokens.Remove(authToken);
-
-        return Task.CompletedTask;
+        return await base.CreateAsync(authToken);
     }
 
     public async Task<AuthToken?> GetByTokenAsync(string token)

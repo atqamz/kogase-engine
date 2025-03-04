@@ -6,23 +6,20 @@ using KogaseEngine.Infra.Persistence;
 
 namespace KogaseEngine.Infra.Repositories.Iam;
 
-public class ProjectRepository : IProjectRepository
+public class ProjectRepository : Repository<Project>, IProjectRepository
 {
-    readonly ApplicationDbContext _context;
-
-    public ProjectRepository(ApplicationDbContext context)
+    public ProjectRepository(ApplicationDbContext context) : base(context)
     {
-        _context = context;
     }
 
-    public async Task<Project?> GetByIdAsync(Guid id)
+    public override async Task<Project?> GetByIdAsync(Guid id)
     {
         return await _context.Projects
             .Include(p => p.Owner)
             .FirstOrDefaultAsync(p => p.Id == id);
     }
 
-    public async Task<IEnumerable<Project>> GetAllAsync(int page = 1, int pageSize = 10)
+    public override async Task<IEnumerable<Project>> GetAllAsync(int page = 1, int pageSize = 10)
     {
         return await _context.Projects
             .Include(p => p.Owner)
@@ -31,39 +28,20 @@ public class ProjectRepository : IProjectRepository
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<Project>> GetByOwnerIdAsync(Guid ownerId)
-    {
-        return await _context.Projects
-            .Where(p => p.OwnerId == ownerId)
-            .ToListAsync();
-    }
-
-    public async Task<Project> CreateAsync(Project project)
+    public override async Task<Project> CreateAsync(Project project)
     {
         project.ApiKey = GenerateApiKey();
         project.CreatedAt = DateTime.UtcNow;
         project.UpdatedAt = DateTime.UtcNow;
 
-        await _context.Projects.AddAsync(project);
-
-        return project;
+        return await base.CreateAsync(project);
     }
 
-    public async Task UpdateAsync(Project project)
+    public async Task<IEnumerable<Project>> GetByOwnerIdAsync(Guid ownerId)
     {
-        project.UpdatedAt = DateTime.UtcNow;
-
-        var existingProject = await _context.Projects.FindAsync(project.Id);
-        if (existingProject == null)
-            throw new KeyNotFoundException($"Project with ID {project.Id} not found.");
-
-        _context.Entry(existingProject).CurrentValues.SetValues(project);
-    }
-
-    public async Task DeleteAsync(Guid id)
-    {
-        var project = await _context.Projects.FindAsync(id);
-        if (project != null) _context.Projects.Remove(project);
+        return await _context.Projects
+            .Where(p => p.OwnerId == ownerId)
+            .ToListAsync();
     }
 
     public async Task<Project?> GetByApiKeyAsync(string apiKey)
@@ -74,7 +52,7 @@ public class ProjectRepository : IProjectRepository
 
     public async Task<string> GenerateNewApiKeyAsync(Guid projectId)
     {
-        var project = await _context.Projects.FindAsync(projectId);
+        var project = await _dbSet.FindAsync(projectId);
         if (project == null)
             throw new KeyNotFoundException($"Project with ID {projectId} not found.");
 

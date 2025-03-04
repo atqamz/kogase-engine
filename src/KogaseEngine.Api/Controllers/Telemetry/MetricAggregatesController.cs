@@ -13,7 +13,7 @@ namespace KogaseEngine.Api.Controllers.Telemetry;
 [Route("api/v1/telemetry/metrics")]
 public class MetricAggregatesController : ControllerBase
 {
-    private readonly MetricAggregateService _metricService;
+    readonly MetricAggregateService _metricService;
 
     public MetricAggregatesController(MetricAggregateService metricService)
     {
@@ -38,9 +38,11 @@ public class MetricAggregatesController : ControllerBase
                 Max = upsertDto.Max,
                 Count = upsertDto.Count,
                 UniqueCount = upsertDto.UniqueCount,
-                AdditionalData = upsertDto.AdditionalData != null ? JsonSerializer.Serialize(upsertDto.AdditionalData) : "{}"
+                AdditionalData = upsertDto.AdditionalData != null
+                    ? JsonSerializer.Serialize(upsertDto.AdditionalData)
+                    : "{}"
             };
-            
+
             var result = await _metricService.UpsertMetricAsync(metric);
             return Ok(MapToDto(result));
         }
@@ -51,12 +53,13 @@ public class MetricAggregatesController : ControllerBase
     }
 
     [HttpPost("batch")]
-    public async Task<ActionResult<IEnumerable<MetricAggregateDto>>> UpsertMetrics([FromBody] IEnumerable<UpsertMetricDto> upsertDtos)
+    public async Task<ActionResult<IEnumerable<MetricAggregateDto>>> UpsertMetrics(
+        [FromBody] IEnumerable<UpsertMetricDto> upsertDtos)
     {
         try
         {
             var metrics = new List<MetricAggregate>();
-            
+
             foreach (var upsertDto in upsertDtos)
             {
                 var metric = new MetricAggregate
@@ -72,12 +75,14 @@ public class MetricAggregatesController : ControllerBase
                     Max = upsertDto.Max,
                     Count = upsertDto.Count,
                     UniqueCount = upsertDto.UniqueCount,
-                    AdditionalData = upsertDto.AdditionalData != null ? JsonSerializer.Serialize(upsertDto.AdditionalData) : "{}"
+                    AdditionalData = upsertDto.AdditionalData != null
+                        ? JsonSerializer.Serialize(upsertDto.AdditionalData)
+                        : "{}"
                 };
-                
+
                 metrics.Add(metric);
             }
-            
+
             var results = await _metricService.UpsertMetricsAsync(metrics);
             return Ok(results.Select(MapToDto));
         }
@@ -93,14 +98,14 @@ public class MetricAggregatesController : ControllerBase
         var metric = await _metricService.GetMetricByIdAsync(metricId);
         if (metric == null)
             return NotFound();
-            
+
         return Ok(MapToDto(metric));
     }
 
     [HttpGet("project/{projectId:guid}")]
     public async Task<ActionResult<IEnumerable<MetricAggregateDto>>> GetMetricsByProject(
-        Guid projectId, 
-        [FromQuery] int page = 1, 
+        Guid projectId,
+        [FromQuery] int page = 1,
         [FromQuery] int pageSize = 100)
     {
         var metrics = await _metricService.GetMetricsByProjectIdAsync(projectId, page, pageSize);
@@ -109,7 +114,7 @@ public class MetricAggregatesController : ControllerBase
 
     [HttpGet("name/{projectId:guid}/{metricName}")]
     public async Task<ActionResult<IEnumerable<MetricAggregateDto>>> GetMetricsByName(
-        Guid projectId, 
+        Guid projectId,
         string metricName)
     {
         var metrics = await _metricService.GetMetricsByNameAsync(projectId, metricName);
@@ -118,8 +123,8 @@ public class MetricAggregatesController : ControllerBase
 
     [HttpGet("dimension/{projectId:guid}/{dimension}/{dimensionValue}")]
     public async Task<ActionResult<IEnumerable<MetricAggregateDto>>> GetMetricsByDimension(
-        Guid projectId, 
-        string dimension, 
+        Guid projectId,
+        string dimension,
         string dimensionValue)
     {
         var metrics = await _metricService.GetMetricsByDimensionAsync(projectId, dimension, dimensionValue);
@@ -128,9 +133,9 @@ public class MetricAggregatesController : ControllerBase
 
     [HttpGet("period/{projectId:guid}/{period}")]
     public async Task<ActionResult<IEnumerable<MetricAggregateDto>>> GetMetricsByPeriod(
-        Guid projectId, 
-        AggregationPeriod period, 
-        [FromQuery] DateTime start, 
+        Guid projectId,
+        AggregationPeriod period,
+        [FromQuery] DateTime start,
         [FromQuery] DateTime end)
     {
         var metrics = await _metricService.GetMetricsByPeriodAsync(projectId, period, start, end);
@@ -139,20 +144,20 @@ public class MetricAggregatesController : ControllerBase
 
     [HttpGet("latest/{projectId:guid}/{metricName}/{dimension}")]
     public async Task<ActionResult<MetricAggregateDto>> GetLatestMetric(
-        Guid projectId, 
-        string metricName, 
+        Guid projectId,
+        string metricName,
         string dimension)
     {
         var metric = await _metricService.GetLatestMetricAsync(projectId, metricName, dimension);
         if (metric == null)
             return NotFound();
-            
+
         return Ok(MapToDto(metric));
     }
 
     [HttpPost("calculate-daily/{projectId:guid}")]
     public async Task<ActionResult> CalculateDailyMetrics(
-        Guid projectId, 
+        Guid projectId,
         [FromQuery] DateTime? date = null)
     {
         try
@@ -167,7 +172,7 @@ public class MetricAggregatesController : ControllerBase
         }
     }
 
-    private MetricAggregateDto MapToDto(MetricAggregate metric)
+    MetricAggregateDto MapToDto(MetricAggregate metric)
     {
         object? additionalData = null;
         try
@@ -179,7 +184,7 @@ public class MetricAggregatesController : ControllerBase
         {
             // If deserialization fails, leave as null
         }
-        
+
         return new MetricAggregateDto
         {
             Id = metric.Id,

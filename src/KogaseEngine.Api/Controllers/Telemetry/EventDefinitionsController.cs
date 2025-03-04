@@ -13,7 +13,7 @@ namespace KogaseEngine.Api.Controllers.Telemetry;
 [Route("api/v1/telemetry/definitions")]
 public class EventDefinitionsController : ControllerBase
 {
-    private readonly EventDefinitionService _definitionService;
+    readonly EventDefinitionService _definitionService;
 
     public EventDefinitionsController(EventDefinitionService definitionService)
     {
@@ -34,7 +34,7 @@ public class EventDefinitionsController : ControllerBase
                 IsEnabled = createDto.IsEnabled,
                 Schema = createDto.Schema != null ? JsonSerializer.Serialize(createDto.Schema) : "{}"
             };
-            
+
             var result = await _definitionService.CreateDefinitionAsync(definition);
             return CreatedAtAction(nameof(GetDefinition), new { definitionId = result.Id }, MapToDto(result));
         }
@@ -45,7 +45,8 @@ public class EventDefinitionsController : ControllerBase
     }
 
     [HttpPut("{definitionId:guid}")]
-    public async Task<ActionResult<EventDefinitionDto>> UpdateDefinition(Guid definitionId, UpdateEventDefinitionDto updateDto)
+    public async Task<ActionResult<EventDefinitionDto>> UpdateDefinition(Guid definitionId,
+        UpdateEventDefinitionDto updateDto)
     {
         try
         {
@@ -56,11 +57,11 @@ public class EventDefinitionsController : ControllerBase
                 IsEnabled = updateDto.IsEnabled,
                 Schema = updateDto.Schema != null ? JsonSerializer.Serialize(updateDto.Schema) : "{}"
             };
-            
+
             var result = await _definitionService.UpdateDefinitionAsync(definitionId, definition);
             if (result == null)
                 return NotFound();
-                
+
             return Ok(MapToDto(result));
         }
         catch (InvalidOperationException ex)
@@ -75,7 +76,7 @@ public class EventDefinitionsController : ControllerBase
         var definition = await _definitionService.GetDefinitionByIdAsync(definitionId);
         if (definition == null)
             return NotFound();
-            
+
         return Ok(MapToDto(definition));
     }
 
@@ -85,7 +86,7 @@ public class EventDefinitionsController : ControllerBase
         var definition = await _definitionService.GetDefinitionByNameAsync(projectId, eventName);
         if (definition == null)
             return NotFound();
-            
+
         return Ok(MapToDto(definition));
     }
 
@@ -97,7 +98,8 @@ public class EventDefinitionsController : ControllerBase
     }
 
     [HttpGet("category/{projectId:guid}/{category}")]
-    public async Task<ActionResult<IEnumerable<EventDefinitionDto>>> GetDefinitionsByCategory(Guid projectId, string category)
+    public async Task<ActionResult<IEnumerable<EventDefinitionDto>>> GetDefinitionsByCategory(Guid projectId,
+        string category)
     {
         var definitions = await _definitionService.GetDefinitionsByCategoryAsync(projectId, category);
         return Ok(definitions.Select(MapToDto));
@@ -109,26 +111,26 @@ public class EventDefinitionsController : ControllerBase
         var success = await _definitionService.DeleteDefinitionAsync(definitionId);
         if (!success)
             return NotFound();
-            
+
         return NoContent();
     }
 
     [HttpPost("validate")]
     public async Task<ActionResult> ValidateEventPayload(
-        [FromQuery] Guid projectId, 
-        [FromQuery] string eventName, 
+        [FromQuery] Guid projectId,
+        [FromQuery] string eventName,
         [FromBody] object payload)
     {
         var payloadJson = JsonSerializer.Serialize(payload);
         var isValid = await _definitionService.ValidateEventPayloadAsync(projectId, eventName, payloadJson);
-        
+
         if (isValid)
             return Ok(new { valid = true });
         else
             return BadRequest(new { valid = false, message = "Event payload does not match the schema" });
     }
 
-    private EventDefinitionDto MapToDto(EventDefinition definition)
+    EventDefinitionDto MapToDto(EventDefinition definition)
     {
         object? schema = null;
         try
@@ -140,7 +142,7 @@ public class EventDefinitionsController : ControllerBase
         {
             // If deserialization fails, leave as null
         }
-        
+
         return new EventDefinitionDto
         {
             Id = definition.Id,

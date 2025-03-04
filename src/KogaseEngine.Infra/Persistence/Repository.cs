@@ -14,29 +14,29 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
         _dbSet = context.Set<TEntity>();
     }
 
-    public async Task<TEntity?> GetByIdAsync(Guid id)
+    public virtual async Task<TEntity?> GetByIdAsync(Guid id)
     {
         return await _dbSet.FindAsync(id);
     }
 
-    public async Task<IEnumerable<TEntity>> GetAllAsync(int page = 1, int pageSize = 10)
+    public virtual async Task<IEnumerable<TEntity>> GetAllAsync(int page = 1, int pageSize = 10)
     {
         return await _dbSet.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
     }
 
-    public async Task<TEntity> CreateAsync(TEntity entity)
+    public virtual async Task<TEntity> CreateAsync(TEntity entity)
     {
         await _dbSet.AddAsync(entity);
         return entity;
     }
 
-    public Task UpdateAsync(TEntity entity)
+    public virtual Task UpdateAsync(TEntity entity)
     {
         _context.Entry(entity).State = EntityState.Modified;
         return Task.CompletedTask;
     }
 
-    public async Task DeleteAsync(Guid id)
+    public virtual async Task DeleteAsync(Guid id)
     {
         var entity = await GetByIdAsync(id);
         if (entity != null) _dbSet.Remove(entity);

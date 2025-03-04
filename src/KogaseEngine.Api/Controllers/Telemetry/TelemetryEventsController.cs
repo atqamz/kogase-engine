@@ -13,9 +13,9 @@ namespace KogaseEngine.Api.Controllers.Telemetry;
 [Route("api/v1/telemetry/events")]
 public class TelemetryEventsController : ControllerBase
 {
-    private readonly TelemetryEventService _eventService;
-    private readonly PlaySessionService _sessionService;
-    private readonly EventDefinitionService _definitionService;
+    readonly TelemetryEventService _eventService;
+    readonly PlaySessionService _sessionService;
+    readonly EventDefinitionService _definitionService;
 
     public TelemetryEventsController(
         TelemetryEventService eventService,
@@ -37,14 +37,14 @@ public class TelemetryEventsController : ControllerBase
             {
                 var payloadJson = JsonSerializer.Serialize(logDto.Payload);
                 var isValid = await _definitionService.ValidateEventPayloadAsync(
-                    logDto.ProjectId, 
-                    logDto.EventName, 
+                    logDto.ProjectId,
+                    logDto.EventName,
                     payloadJson);
-                    
+
                 if (!isValid)
                     return BadRequest(new { message = "Invalid event payload format" });
             }
-            
+
             var telemetryEvent = new TelemetryEvent
             {
                 ProjectId = logDto.ProjectId,
@@ -57,7 +57,7 @@ public class TelemetryEventsController : ControllerBase
                 Parameters = logDto.Parameters != null ? JsonSerializer.Serialize(logDto.Parameters) : "{}",
                 ClientInfo = logDto.ClientInfo != null ? JsonSerializer.Serialize(logDto.ClientInfo) : "{}"
             };
-            
+
             var result = await _eventService.LogEventAsync(telemetryEvent);
             return Ok(MapToDto(result));
         }
@@ -73,13 +73,13 @@ public class TelemetryEventsController : ControllerBase
         try
         {
             var events = new List<TelemetryEvent>();
-            
+
             foreach (var logDto in batchDto.Events)
             {
                 // We'll do basic validation but not schema validation for batch operations
                 if (logDto.ProjectId != batchDto.ProjectId)
                     return BadRequest(new { message = "All events in batch must have the same ProjectId" });
-                    
+
                 var telemetryEvent = new TelemetryEvent
                 {
                     ProjectId = logDto.ProjectId,
@@ -92,10 +92,10 @@ public class TelemetryEventsController : ControllerBase
                     Parameters = logDto.Parameters != null ? JsonSerializer.Serialize(logDto.Parameters) : "{}",
                     ClientInfo = logDto.ClientInfo != null ? JsonSerializer.Serialize(logDto.ClientInfo) : "{}"
                 };
-                
+
                 events.Add(telemetryEvent);
             }
-            
+
             var results = await _eventService.LogEventsAsync(events);
             return Ok(results.Select(MapToDto));
         }
@@ -111,14 +111,14 @@ public class TelemetryEventsController : ControllerBase
         var telemetryEvent = await _eventService.GetEventByIdAsync(eventId);
         if (telemetryEvent == null)
             return NotFound();
-            
+
         return Ok(MapToDto(telemetryEvent));
     }
 
     [HttpGet("project/{projectId:guid}")]
     public async Task<ActionResult<IEnumerable<TelemetryEventDto>>> GetEventsByProject(
-        Guid projectId, 
-        [FromQuery] int page = 1, 
+        Guid projectId,
+        [FromQuery] int page = 1,
         [FromQuery] int pageSize = 100)
     {
         var events = await _eventService.GetEventsByProjectIdAsync(projectId, page, pageSize);
@@ -131,15 +131,15 @@ public class TelemetryEventsController : ControllerBase
         var session = await _sessionService.GetSessionByIdAsync(sessionId);
         if (session == null)
             return NotFound(new { message = "Session not found" });
-            
+
         var events = await _eventService.GetEventsBySessionIdAsync(sessionId);
         return Ok(events.Select(MapToDto));
     }
 
     [HttpGet("user/{userId:guid}")]
     public async Task<ActionResult<IEnumerable<TelemetryEventDto>>> GetEventsByUser(
-        Guid userId, 
-        [FromQuery] int page = 1, 
+        Guid userId,
+        [FromQuery] int page = 1,
         [FromQuery] int pageSize = 100)
     {
         var events = await _eventService.GetEventsByUserIdAsync(userId, page, pageSize);
@@ -148,8 +148,8 @@ public class TelemetryEventsController : ControllerBase
 
     [HttpGet("device/{deviceId:guid}")]
     public async Task<ActionResult<IEnumerable<TelemetryEventDto>>> GetEventsByDevice(
-        Guid deviceId, 
-        [FromQuery] int page = 1, 
+        Guid deviceId,
+        [FromQuery] int page = 1,
         [FromQuery] int pageSize = 100)
     {
         var events = await _eventService.GetEventsByDeviceIdAsync(deviceId, page, pageSize);
@@ -158,9 +158,9 @@ public class TelemetryEventsController : ControllerBase
 
     [HttpGet("name/{projectId:guid}/{eventName}")]
     public async Task<ActionResult<IEnumerable<TelemetryEventDto>>> GetEventsByName(
-        Guid projectId, 
-        string eventName, 
-        [FromQuery] int page = 1, 
+        Guid projectId,
+        string eventName,
+        [FromQuery] int page = 1,
         [FromQuery] int pageSize = 100)
     {
         var events = await _eventService.GetEventsByNameAsync(projectId, eventName, page, pageSize);
@@ -169,9 +169,9 @@ public class TelemetryEventsController : ControllerBase
 
     [HttpGet("category/{projectId:guid}/{category}")]
     public async Task<ActionResult<IEnumerable<TelemetryEventDto>>> GetEventsByCategory(
-        Guid projectId, 
-        string category, 
-        [FromQuery] int page = 1, 
+        Guid projectId,
+        string category,
+        [FromQuery] int page = 1,
         [FromQuery] int pageSize = 100)
     {
         var events = await _eventService.GetEventsByCategoryAsync(projectId, category, page, pageSize);
@@ -180,10 +180,10 @@ public class TelemetryEventsController : ControllerBase
 
     [HttpGet("timerange/{projectId:guid}")]
     public async Task<ActionResult<IEnumerable<TelemetryEventDto>>> GetEventsByTimeRange(
-        Guid projectId, 
-        [FromQuery] DateTime start, 
-        [FromQuery] DateTime end, 
-        [FromQuery] int page = 1, 
+        Guid projectId,
+        [FromQuery] DateTime start,
+        [FromQuery] DateTime end,
+        [FromQuery] int page = 1,
         [FromQuery] int pageSize = 100)
     {
         var events = await _eventService.GetEventsByTimeRangeAsync(projectId, start, end, page, pageSize);
@@ -204,20 +204,20 @@ public class TelemetryEventsController : ControllerBase
         return Ok(new { count });
     }
 
-    private TelemetryEventDto MapToDto(TelemetryEvent telemetryEvent)
+    TelemetryEventDto MapToDto(TelemetryEvent telemetryEvent)
     {
         object? payload = null;
         object? parameters = null;
         object? clientInfo = null;
-        
+
         try
         {
             if (!string.IsNullOrEmpty(telemetryEvent.Payload))
                 payload = JsonSerializer.Deserialize<object>(telemetryEvent.Payload);
-                
+
             if (!string.IsNullOrEmpty(telemetryEvent.Parameters))
                 parameters = JsonSerializer.Deserialize<object>(telemetryEvent.Parameters);
-                
+
             if (!string.IsNullOrEmpty(telemetryEvent.ClientInfo))
                 clientInfo = JsonSerializer.Deserialize<object>(telemetryEvent.ClientInfo);
         }
@@ -225,7 +225,7 @@ public class TelemetryEventsController : ControllerBase
         {
             // If deserialization fails, leave as null
         }
-        
+
         return new TelemetryEventDto
         {
             Id = telemetryEvent.Id,

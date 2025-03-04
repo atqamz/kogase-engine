@@ -95,16 +95,18 @@ public class UsersController : ControllerBase
             return NotFound();
 
         var projects = await _userService.GetUserProjectsAsync(userId);
-        return Ok(projects.Select(p => new ProjectDto
-        {
-            Id = p.Id,
-            Name = p.Name,
-            Description = p.Description,
-            OwnerId = p.OwnerId,
-            Status = p.Status,
-            CreatedAt = p.CreatedAt,
-            UpdatedAt = p.UpdatedAt
-        }));
+        return Ok(projects
+            .Where(p => p != null)
+            .Select(p => new ProjectDto
+            {
+                Id = p!.Id,
+                Name = p.Name,
+                Description = p.Description,
+                OwnerId = p.OwnerId,
+                Status = p.Status,
+                CreatedAt = p.CreatedAt,
+                UpdatedAt = p.UpdatedAt
+            }));
     }
 
     UserDto MapToDto(User user)

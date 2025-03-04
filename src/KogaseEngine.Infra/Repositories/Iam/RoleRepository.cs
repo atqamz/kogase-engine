@@ -33,11 +33,6 @@ public class RoleRepository : IRoleRepository
             .FirstOrDefaultAsync(r => r.Name.ToLower() == name.ToLower());
     }
 
-    public async Task<IEnumerable<Role>> GetAllAsync()
-    {
-        return await _context.Roles.ToListAsync();
-    }
-
     public async Task<Role> CreateAsync(Role role)
     {
         await _context.Roles.AddAsync(role);

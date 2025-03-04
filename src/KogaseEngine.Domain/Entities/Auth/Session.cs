@@ -14,9 +14,9 @@ public class Session
     public string UserAgent { get; set; } = string.Empty;
     public SessionStatus Status { get; set; }
 
-    public virtual Project Project { get; set; } = null!;
+    public virtual Project? Project { get; set; }
     public virtual User? User { get; set; }
-    public virtual Device Device { get; set; } = null!;
+    public virtual Device? Device { get; set; }
 }
 
 public enum SessionStatus

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace KogaseEngine.Infra.Persistence.Migrations
+namespace KogaseEngine.Infra.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration
@@ -97,7 +97,7 @@ namespace KogaseEngine.Infra.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "MetricAggregates",
+                name: "MetricAggregate",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -111,9 +111,9 @@ namespace KogaseEngine.Infra.Persistence.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_MetricAggregates", x => x.Id);
+                    table.PrimaryKey("PK_MetricAggregate", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_MetricAggregates_Projects_ProjectId",
+                        name: "FK_MetricAggregate_Projects_ProjectId",
                         column: x => x.ProjectId,
                         principalTable: "Projects",
                         principalColumn: "Id",
@@ -223,49 +223,7 @@ namespace KogaseEngine.Infra.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "PlaySessions",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    ProjectId = table.Column<Guid>(type: "uuid", nullable: false),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: true),
-                    DeviceId = table.Column<Guid>(type: "uuid", nullable: false),
-                    SessionId = table.Column<Guid>(type: "uuid", nullable: false),
-                    StartTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    EndTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    Duration = table.Column<int>(type: "integer", nullable: true),
-                    PlayData = table.Column<string>(type: "text", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PlaySessions", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_PlaySessions_Devices_DeviceId",
-                        column: x => x.DeviceId,
-                        principalTable: "Devices",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_PlaySessions_Projects_ProjectId",
-                        column: x => x.ProjectId,
-                        principalTable: "Projects",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_PlaySessions_Sessions_SessionId",
-                        column: x => x.SessionId,
-                        principalTable: "Sessions",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_PlaySessions_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "TelemetryEvents",
+                name: "TelemetryEvent",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -282,26 +240,26 @@ namespace KogaseEngine.Infra.Persistence.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TelemetryEvents", x => x.Id);
+                    table.PrimaryKey("PK_TelemetryEvent", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_TelemetryEvents_Devices_DeviceId",
+                        name: "FK_TelemetryEvent_Devices_DeviceId",
                         column: x => x.DeviceId,
                         principalTable: "Devices",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_TelemetryEvents_Projects_ProjectId",
+                        name: "FK_TelemetryEvent_Projects_ProjectId",
                         column: x => x.ProjectId,
                         principalTable: "Projects",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_TelemetryEvents_Sessions_SessionId",
+                        name: "FK_TelemetryEvent_Sessions_SessionId",
                         column: x => x.SessionId,
                         principalTable: "Sessions",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_TelemetryEvents_Users_UserId",
+                        name: "FK_TelemetryEvent_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id");
@@ -311,6 +269,16 @@ namespace KogaseEngine.Infra.Persistence.Migrations
                 name: "IX_AuthTokens_DeviceId",
                 table: "AuthTokens",
                 column: "DeviceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AuthTokens_RefreshToken",
+                table: "AuthTokens",
+                column: "RefreshToken");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AuthTokens_Token",
+                table: "AuthTokens",
+                column: "Token");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AuthTokens_UserId",
@@ -324,30 +292,10 @@ namespace KogaseEngine.Infra.Persistence.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_MetricAggregates_ProjectId_MetricName_Date_Dimension_Dimens~",
-                table: "MetricAggregates",
+                name: "IX_MetricAggregate_ProjectId_MetricName_Date_Dimension_Dimensi~",
+                table: "MetricAggregate",
                 columns: new[] { "ProjectId", "MetricName", "Date", "Dimension", "DimensionValue" },
                 unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_PlaySessions_DeviceId",
-                table: "PlaySessions",
-                column: "DeviceId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_PlaySessions_ProjectId",
-                table: "PlaySessions",
-                column: "ProjectId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_PlaySessions_SessionId",
-                table: "PlaySessions",
-                column: "SessionId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_PlaySessions_UserId",
-                table: "PlaySessions",
-                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Projects_ApiKey",
@@ -376,24 +324,24 @@ namespace KogaseEngine.Infra.Persistence.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TelemetryEvents_DeviceId",
-                table: "TelemetryEvents",
+                name: "IX_TelemetryEvent_DeviceId",
+                table: "TelemetryEvent",
                 column: "DeviceId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TelemetryEvents_ProjectId_Timestamp",
-                table: "TelemetryEvents",
+                name: "IX_TelemetryEvent_ProjectId_Timestamp",
+                table: "TelemetryEvent",
                 columns: new[] { "ProjectId", "Timestamp" },
                 descending: new[] { false, true });
 
             migrationBuilder.CreateIndex(
-                name: "IX_TelemetryEvents_SessionId",
-                table: "TelemetryEvents",
+                name: "IX_TelemetryEvent_SessionId",
+                table: "TelemetryEvent",
                 column: "SessionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TelemetryEvents_UserId",
-                table: "TelemetryEvents",
+                name: "IX_TelemetryEvent_UserId",
+                table: "TelemetryEvent",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -419,13 +367,10 @@ namespace KogaseEngine.Infra.Persistence.Migrations
                 name: "AuthTokens");
 
             migrationBuilder.DropTable(
-                name: "MetricAggregates");
+                name: "MetricAggregate");
 
             migrationBuilder.DropTable(
-                name: "PlaySessions");
-
-            migrationBuilder.DropTable(
-                name: "TelemetryEvents");
+                name: "TelemetryEvent");
 
             migrationBuilder.DropTable(
                 name: "UserRoles");

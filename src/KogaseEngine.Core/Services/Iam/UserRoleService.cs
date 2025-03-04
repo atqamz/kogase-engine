@@ -17,7 +17,8 @@ public class UserRoleService
         IUserRepository userRepository,
         IRoleRepository roleRepository,
         IProjectRepository projectRepository,
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork
+    )
     {
         _userRoleRepository = userRoleRepository;
         _userRepository = userRepository;

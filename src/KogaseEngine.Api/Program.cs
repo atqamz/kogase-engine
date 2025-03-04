@@ -1,16 +1,28 @@
-using Microsoft.EntityFrameworkCore;
-using KogaseEngine.Domain.Interfaces;
-using KogaseEngine.Domain.Interfaces.Iam;
-using KogaseEngine.Core.Services.Iam;
-using KogaseEngine.Infra.Persistence;
-using KogaseEngine.Infra.Repositories.Iam;
 using KogaseEngine.Api.Data;
+using KogaseEngine.Core.Services.Auth;
+using KogaseEngine.Core.Services.Iam;
+using KogaseEngine.Domain.Interfaces.Auth;
+using KogaseEngine.Domain.Interfaces.Iam;
+using KogaseEngine.Domain.Interfaces;
+using KogaseEngine.Infra.Persistence;
+using KogaseEngine.Infra.Repositories.Auth;
+using KogaseEngine.Infra.Repositories.Iam;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Text;
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+
 // Add services to the container.
 builder.Services.AddControllers();
+
+
 
 // Register Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();
@@ -24,26 +36,85 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+
+
 // Add DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+
+
 // Register repositories
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-// IAM Module
+
+
+// Register Repositories
+// IAM Module repositories
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
 
+// Auth Module repositories
+builder.Services.AddScoped<IDeviceRepository, DeviceRepository>();
+builder.Services.AddScoped<ISessionRepository, SessionRepository>();
+builder.Services.AddScoped<IAuthTokenRepository, AuthTokenRepository>();
+
+
+
 // Register services
+// IAM Module services
 builder.Services.AddScoped<ProjectService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<RoleService>();
 builder.Services.AddScoped<UserRoleService>();
 
+// Auth Module services
+builder.Services.AddScoped<DeviceService>();
+builder.Services.AddScoped<SessionService>();
+
+
+// Configure JWT Authentication
+var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+var jwtSecret = jwtSettings["Secret"] ?? "thisisasecretkeyforjwttokengenerationalgorithmkeyshouldbelonger";
+builder.Services.AddScoped<AuthService>(provider => new AuthService(
+    provider.GetRequiredService<IAuthTokenRepository>(),
+    provider.GetRequiredService<IUserRepository>(),
+    provider.GetRequiredService<IDeviceRepository>(),
+    provider.GetRequiredService<ISessionRepository>(),
+    provider.GetRequiredService<IUnitOfWork>(),
+    jwtSecret,
+    int.Parse(jwtSettings["TokenExpirationMinutes"] ?? "60"),
+    int.Parse(jwtSettings["RefreshTokenExpirationDays"] ?? "7")
+));
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSecret)),
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ClockSkew = TimeSpan.Zero
+        };
+    });
+
+
+
 var app = builder.Build();
+
+
+
+// Initialize the database
+using (var scope = app.Services.CreateScope())
+{
+    await DbInitializer.Initialize(scope.ServiceProvider);
+}
+
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -56,14 +127,12 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+
+
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 
-// Initialize the database
-using (var scope = app.Services.CreateScope())
-{
-    await DbInitializer.Initialize(scope.ServiceProvider);
-}
+
 
 app.Run();

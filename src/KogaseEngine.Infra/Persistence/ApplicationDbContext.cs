@@ -23,16 +23,11 @@ public class ApplicationDbContext : DbContext
     public DbSet<Session> Sessions { get; set; } = null!;
     public DbSet<AuthToken> AuthTokens { get; set; } = null!;
 
-    // Telemetry Module
-    public DbSet<TelemetryEvent> TelemetryEvents { get; set; } = null!;
-    public DbSet<PlaySession> PlaySessions { get; set; } = null!;
-    public DbSet<MetricAggregate> MetricAggregates { get; set; } = null!;
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
-        // Configure IAM entities
+        // IAM Module configurations
         modelBuilder.Entity<UserRole>()
             .HasKey(ur => new { ur.UserId, ur.RoleId });
 
@@ -71,6 +66,42 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<Device>()
             .HasIndex(d => new { d.ProjectId, d.InstallId })
             .IsUnique();
+
+        modelBuilder.Entity<Device>()
+            .HasOne(d => d.Project)
+            .WithMany()
+            .HasForeignKey(d => d.ProjectId);
+
+        modelBuilder.Entity<Session>()
+            .HasOne(s => s.Project)
+            .WithMany()
+            .HasForeignKey(s => s.ProjectId);
+
+        modelBuilder.Entity<Session>()
+            .HasOne(s => s.User)
+            .WithMany()
+            .HasForeignKey(s => s.UserId);
+
+        modelBuilder.Entity<Session>()
+            .HasOne(s => s.Device)
+            .WithMany(d => d.Sessions)
+            .HasForeignKey(s => s.DeviceId);
+
+        modelBuilder.Entity<AuthToken>()
+            .HasOne(t => t.User)
+            .WithMany()
+            .HasForeignKey(t => t.UserId);
+
+        modelBuilder.Entity<AuthToken>()
+            .HasOne(t => t.Device)
+            .WithMany(d => d.AuthTokens)
+            .HasForeignKey(t => t.DeviceId);
+
+        modelBuilder.Entity<AuthToken>()
+            .HasIndex(t => t.Token);
+
+        modelBuilder.Entity<AuthToken>()
+            .HasIndex(t => t.RefreshToken);
 
         // Telemetry Module configurations
         modelBuilder.Entity<TelemetryEvent>()

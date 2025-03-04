@@ -3,17 +3,20 @@ using System;
 using KogaseEngine.Infra.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace KogaseEngine.Infra.Persistence.Migrations
+namespace KogaseEngine.Infra.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250304144939_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -54,6 +57,10 @@ namespace KogaseEngine.Infra.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("DeviceId");
+
+                    b.HasIndex("RefreshToken");
+
+                    b.HasIndex("Token");
 
                     b.HasIndex("UserId");
 
@@ -319,51 +326,7 @@ namespace KogaseEngine.Infra.Persistence.Migrations
                     b.HasIndex("ProjectId", "MetricName", "Date", "Dimension", "DimensionValue")
                         .IsUnique();
 
-                    b.ToTable("MetricAggregates");
-                });
-
-            modelBuilder.Entity("KogaseEngine.Domain.Entities.Telemetry.PlaySession", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("DeviceId")
-                        .HasColumnType("uuid");
-
-                    b.Property<int?>("Duration")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime?>("EndTime")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("PlayData")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("ProjectId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("SessionId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("StartTime")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DeviceId");
-
-                    b.HasIndex("ProjectId");
-
-                    b.HasIndex("SessionId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("PlaySessions");
+                    b.ToTable("MetricAggregate");
                 });
 
             modelBuilder.Entity("KogaseEngine.Domain.Entities.Telemetry.TelemetryEvent", b =>
@@ -417,7 +380,7 @@ namespace KogaseEngine.Infra.Persistence.Migrations
                     b.HasIndex("ProjectId", "Timestamp")
                         .IsDescending(false, true);
 
-                    b.ToTable("TelemetryEvents");
+                    b.ToTable("TelemetryEvent");
                 });
 
             modelBuilder.Entity("KogaseEngine.Domain.Entities.Auth.AuthToken", b =>
@@ -526,39 +489,6 @@ namespace KogaseEngine.Infra.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("Project");
-                });
-
-            modelBuilder.Entity("KogaseEngine.Domain.Entities.Telemetry.PlaySession", b =>
-                {
-                    b.HasOne("KogaseEngine.Domain.Entities.Auth.Device", "Device")
-                        .WithMany()
-                        .HasForeignKey("DeviceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("KogaseEngine.Domain.Entities.Iam.Project", "Project")
-                        .WithMany()
-                        .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("KogaseEngine.Domain.Entities.Auth.Session", "Session")
-                        .WithMany()
-                        .HasForeignKey("SessionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("KogaseEngine.Domain.Entities.Iam.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("Device");
-
-                    b.Navigation("Project");
-
-                    b.Navigation("Session");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("KogaseEngine.Domain.Entities.Telemetry.TelemetryEvent", b =>

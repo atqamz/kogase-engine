@@ -16,17 +16,17 @@ public class Device
     public DeviceStatus Status { get; set; }
     public string Metadata { get; set; } = string.Empty; // JSON
 
-    public virtual Project Project { get; set; } = null!;
+    public virtual Project? Project { get; set; }
     public virtual ICollection<Session> Sessions { get; set; } = new List<Session>();
     public virtual ICollection<AuthToken> AuthTokens { get; set; } = new List<AuthToken>();
 }
 
 public enum DevicePlatform
 {
-    iOS,
+    IOS,
     Android,
     Windows,
-    macOS,
+    MacOS,
     Linux,
     WebGL
 }

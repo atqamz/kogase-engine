@@ -13,6 +13,6 @@ public class AuthToken
     public DateTime ExpiresAt { get; set; }
     public DateTime? RevokedAt { get; set; }
 
-    public virtual User User { get; set; } = null!;
+    public virtual User? User { get; set; }
     public virtual Device? Device { get; set; }
 }
